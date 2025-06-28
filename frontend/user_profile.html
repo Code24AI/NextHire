@@ -1,0 +1,472 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Candidate Profile - NextHire</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f6f8;
+            color: #333;
+        }
+        /* Navbar */
+        .navbar {
+            background-color: #1976d2;
+            color: white;
+            padding: 10px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 1000;
+            box-sizing: border-box;
+        }
+        .navbar .logo {
+            font-size: 1.5em;
+            font-weight: bold;
+        }
+        .navbar .nav-links {
+            display: flex;
+            align-items: center;
+        }
+        .navbar .nav-links a,
+        .navbar .nav-links button {
+            color: white;
+            margin-left: 20px;
+            text-decoration: none;
+            font-size: 1em;
+            white-space: nowrap;
+            cursor: pointer;
+            background: none;
+            border: none;
+            font-family: inherit;
+            padding: 0;
+        }
+        .navbar .nav-links a:hover,
+        .navbar .nav-links button:hover {
+            text-decoration: underline;
+        }
+        /* Main Content */
+        .container {
+            max-width: 1200px;
+            margin: 80px auto 20px;
+            padding: 20px;
+        }
+        /* Profile Section */
+        .profile-container {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .profile-container h2 {
+            margin-top: 0;
+            color: #1976d2;
+        }
+        .profile-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        .profile-image {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .profile-image img {
+            max-width: 150px;
+            max-height: 150px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+        .profile-info {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+        .profile-field {
+            margin-bottom: 10px;
+        }
+        .profile-field label {
+            font-weight: bold;
+            color: #1976d2;
+        }
+        .profile-field p,
+        .profile-field input,
+        .profile-field textarea {
+            margin: 5px 0;
+            font-size: 1em;
+        }
+        .profile-field input,
+        .profile-field textarea {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+        .profile-field textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+        .edit-btn, .save-btn, .cancel-btn {
+            background-color: #1976d2;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 1em;
+        }
+        .edit-btn:hover, .save-btn:hover, .cancel-btn:hover {
+            background-color: #1565c0;
+        }
+        .save-btn, .cancel-btn {
+            margin-right: 10px;
+        }
+        .error {
+            color: red;
+            text-align: center;
+            margin: 10px 0;
+        }
+        .sucess {
+            color: rgb(15, 141, 214);
+            text-align: center;
+            margin: 10px 0;
+        }
+        /* Responsive Design */
+        @media (max-width: 600px) {
+            .navbar .nav-links {
+                flex-direction: column;
+                position: absolute;
+                top: 60px;
+                right: 20px;
+                background-color: #1976d2;
+                padding: 10px;
+                display: none;
+            }
+            .navbar .nav-links.active {
+                display: flex;
+            }
+            .navbar .nav-links a,
+            .navbar .nav-links button {
+                margin: 10px 0;
+            }
+            .container {
+                margin-top: 120px;
+            }
+            .profile-info {
+                grid-template-columns: 1fr;
+            }
+            .edit-btn, .save-btn, .cancel-btn {
+                width: 100%;
+                margin-bottom: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Page Protection -->
+    <script>
+        if (!localStorage.getItem("user_id") || !localStorage.getItem("access_token")) {
+            window.location.href = "login.html";
+        }
+    </script>
+    <div class="navbar">
+        <div class="logo">NextHire</div>
+        <div class="nav-links" id="navLinks">
+            <a href="userdashboard.html">Dashboard</a>
+            <button id="interviewBtn">Interview</button>
+            <a href="#" id="logoutLink">Logout</a>
+        </div>
+    </div>
+    <div class="container">
+        <div class="profile-container">
+            <div class="profile-header">
+                <h2>Candidate Profile</h2>
+                <button class="edit-btn" id="editBtn">Edit Profile</button>
+            </div>
+            <div id="errorMsg" class="error"></div>
+            <div id="successMsg" class="sucess"></div>
+            <div class="profile-image">
+                <img id="profileImage" src="" alt="Profile Image" style="display: none;">
+            </div>
+            <div class="profile-info">
+                <div class="profile-field">
+                    <label>Name:</label>
+                    <p id="name">Loading...</p>
+                    <input type="text" id="nameInput" style="display: none;">
+                </div>
+                <div class="profile-field">
+                    <label>Email:</label>
+                    <p id="email">Loading...</p>
+                    <input type="email" id="emailInput" style="display: none;">
+                </div>
+                <div class="profile-field">
+                    <label>Phone:</label>
+                    <p id="phone">N/A</p>
+                    <input type="text" id="phoneInput" style="display: none;">
+                </div>
+                <div class="profile-field">
+                    <label>Address:</label>
+                    <p id="address">N/A</p>
+                    <input type="text" id="addressInput" style="display: none;">
+                </div>
+                <div class="profile-field">
+                    <label>Highest Education:</label>
+                    <p id="highest_education">N/A</p>
+                    <input type="text" id="highest_educationInput" style="display: none;">
+                </div>
+                <div class="profile-field">
+                    <label>Institution:</label>
+                    <p id="institution">N/A</p>
+                    <input type="text" id="institutionInput" style="display: none;">
+                </div>
+                <div class="profile-field">
+                    <label>Graduation Year:</label>
+                    <p id="graduation_year">N/A</p>
+                    <input type="text" id="graduation_yearInput" style="display: none;">
+                </div>
+                <div class="profile-field">
+                    <label>CGPA:</label>
+                    <p id="cgpa">N/A</p>
+                    <input type="text" id="cgpaInput" style="display: none;">
+                </div>
+                <div class="profile-field">
+                    <label>Skills:</label>
+                    <p id="skills">N/A</p>
+                    <textarea id="skillsInput" style="display: none;"></textarea>
+                </div>
+                <div class="profile-field">
+                    <label>Previous Company:</label>
+                    <p id="previous_company">N/A</p>
+                    <input type="text" id="previous_companyInput" style="display: none;">
+                </div>
+                <div class="profile-field">
+                    <label>Positions:</label>
+                    <p id="positions">N/A</p>
+                    <input type="text" id="positionsInput" style="display: none;">
+                </div>
+                <div class="profile-field">
+                    <label>Responsibilities:</label>
+                    <p id="responsibilities">N/A</p>
+                    <textarea id="responsibilitiesInput" style="display: none;"></textarea>
+                </div>
+                <div class="profile-field">
+                    <label>Experience Years:</label>
+                    <p id="experience_years">N/A</p>
+                    <input type="text" id="experience_yearsInput" style="display: none;">
+                </div>
+                <div class="profile-field">
+                    <label>Projects Description:</label>
+                    <p id="projects_description">N/A</p>
+                    <textarea id="projects_descriptionInput" style="display: none;"></textarea>
+                </div>
+                <div class="profile-field">
+                    <label>Project Tech Stack:</label>
+                    <p id="project_techstack">N/A</p>
+                    <textarea id="project_techstackInput" style="display: none;"></textarea>
+                </div>
+                <div class="profile-field">
+                    <label>Project Link:</label>
+                    <p id="project_link">N/A</p>
+                    <input type="url" id="project_linkInput" style="display: none;">
+                </div>
+                <div class="profile-field">
+                    <label>LinkedIn:</label>
+                    <p id="linkedin">N/A</p>
+                    <input type="url" id="linkedinInput" style="display: none;">
+                </div>
+                <div class="profile-field">
+                    <label>GitHub:</label>
+                    <p id="github">N/A</p>
+                    <input type="url" id="githubInput" style="display: none;">
+                </div>
+                <div class="profile-field">
+                    <label>Current Status:</label>
+                    <p id="current_status">N/A</p>
+                    <input type="text" id="current_statusInput" style="display: none;">
+                </div>
+                <div class="profile-field">
+                    <label>Strength:</label>
+                    <p id="strength">N/A</p>
+                    <textarea id="strengthInput" style="display: none;"></textarea>
+                </div>
+                <div class="profile-field">
+                    <label>Weakness:</label>
+                    <p id="weakness">N/A</p>
+                    <textarea id="weaknessInput" style="display: none;"></textarea>
+                </div>
+                <div class="profile-field">
+                    <label>When You Can Join:</label>
+                    <p id="when_you_can_join">N/A</p>
+                    <input type="text" id="when_you_can_joinInput" style="display: none;">
+                </div>
+                <div class="profile-field">
+                    <label>Profile Image URL:</label>
+                    <p id="image">N/A</p>
+                    <input type="url" id="imageInput" style="display: none;">
+                </div>
+            </div>
+            <div id="editButtons" style="display: none; margin-top: 20px;">
+                <button class="save-btn" id="saveBtn">Save Changes</button>
+                <button class="cancel-btn" id="cancelBtn">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE_URL = 'http://127.0.0.1:8000';
+        const accessToken = localStorage.getItem('access_token');
+        const userId = localStorage.getItem('user_id');
+        let originalData = {};
+
+        // Fetch Candidate Profile
+        async function fetchCandidateProfile() {
+            try {
+                const response = await fetch(`${API_BASE_URL}/user_apis/candidates/${userId}`, {
+                    headers: {
+                        'Authorization': `Bearer ${accessToken}`
+                    }
+                });
+                if (!response.ok) {
+                    throw new Error('Failed to fetch candidate data');
+                }
+                const data = await response.json();
+                originalData = data;
+                displayProfile(data);
+            } catch (error) {
+                document.getElementById('errorMsg').textContent = 'Error loading profile data';
+                console.error('Error fetching candidate profile:', error);
+            }
+        }
+
+        // Display Profile Data
+        function displayProfile(data) {
+            const fields = [
+                'name', 'email', 'phone', 'address', 'highest_education', 'institution',
+                'graduation_year', 'cgpa', 'skills', 'previous_company', 'positions',
+                'responsibilities', 'experience_years', 'projects_description',
+                'project_techstack', 'project_link', 'linkedin', 'github',
+                'current_status', 'strength', 'weakness', 'when_you_can_join', 'image'
+            ];
+            fields.forEach(field => {
+                const displayElement = document.getElementById(field);
+                const inputElement = document.getElementById(`${field}Input`);
+                displayElement.textContent = data[field] || 'N/A';
+                inputElement.value = data[field] || '';
+            });
+            const profileImage = document.getElementById('profileImage');
+            if (data.image) {
+                profileImage.src = data.image;
+                profileImage.style.display = 'block';
+            } else {
+                profileImage.style.display = 'none';
+            }
+        }
+
+        // Toggle Edit Mode
+        function toggleEditMode(isEditing) {
+            const fields = [
+                'name', 'email', 'phone', 'address', 'highest_education', 'institution',
+                'graduation_year', 'cgpa', 'skills', 'previous_company', 'positions',
+                'responsibilities', 'experience_years', 'projects_description',
+                'project_techstack', 'project_link', 'linkedin', 'github',
+                'current_status', 'strength', 'weakness', 'when_you_can_join', 'image'
+            ];
+            fields.forEach(field => {
+                const displayElement = document.getElementById(field);
+                const inputElement = document.getElementById(`${field}Input`);
+                displayElement.style.display = isEditing ? 'none' : 'block';
+                inputElement.style.display = isEditing ? 'block' : 'none';
+            });
+            document.getElementById('editBtn').style.display = isEditing ? 'none' : 'block';
+            document.getElementById('editButtons').style.display = isEditing ? 'block' : 'none';
+        }
+
+        // Save Changes
+        async function saveChanges() {
+            const updatedData = {};
+            const fields = [
+                'name', 'email', 'phone', 'address', 'highest_education', 'institution',
+                'graduation_year', 'cgpa', 'skills', 'previous_company', 'positions',
+                'responsibilities', 'experience_years', 'projects_description',
+                'project_techstack', 'project_link', 'linkedin', 'github',
+                'current_status', 'strength', 'weakness', 'when_you_can_join', 'image'
+            ];
+            fields.forEach(field => {
+                const inputElement = document.getElementById(`${field}Input`);
+                if (inputElement.value !== (originalData[field] || '')) {
+                    updatedData[field] = inputElement.value || null;
+                }
+            });
+
+            if (Object.keys(updatedData).length === 0) {
+                toggleEditMode(false);
+                return;
+            }
+
+            try {
+                const response = await fetch(`${API_BASE_URL}/user_apis/user_APIs/candidates/${userId}`, {
+                    method: 'PATCH',
+                    headers: {
+                        'Authorization': `Bearer ${accessToken}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(updatedData)
+                });
+                if (!response.ok) {
+                    throw new Error('Failed to update candidate data');
+                }
+                const data = await response.json();
+                originalData = { ...originalData, ...updatedData };
+                displayProfile(originalData);
+                toggleEditMode(false);
+                document.getElementById('successMsg').textContent = 'Profile updated successfully!';
+                setTimeout(() => document.getElementById('successMsg').textContent = '', 5000);
+            } catch (error) {
+                document.getElementById('errorMsg').textContent = 'Error updating profile data';
+                console.error('Error updating candidate profile:', error);
+            }
+        }
+
+        // Initialize Page
+        document.addEventListener('DOMContentLoaded', () => {
+            fetchCandidateProfile();
+
+            // Edit Button
+            document.getElementById('editBtn').addEventListener('click', () => {
+                toggleEditMode(true);
+            });
+
+            // Save Button
+            document.getElementById('saveBtn').addEventListener('click', saveChanges);
+
+            // Cancel Button
+            document.getElementById('cancelBtn').addEventListener('click', () => {
+                displayProfile(originalData);
+                toggleEditMode(false);
+            });
+
+            // Interview Button
+            document.getElementById('interviewBtn').onclick = function() {
+                window.location.href = "interviewbefore.html";
+            };
+
+            // Logout
+            document.getElementById('logoutLink').onclick = function(e) {
+                e.preventDefault();
+                localStorage.removeItem("user_id");
+                localStorage.removeItem("access_token");
+                localStorage.clear();
+                window.location.href = "login.html";
+            };
+        });
+    </script>
+</body>
+</html>

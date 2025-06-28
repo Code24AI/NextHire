@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Login - NextHire</title>
+  <link rel="stylesheet" href="css/style.css" />
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #a8d0ff 0%, #ffffff 100%);
+    }
+    .footspacing{
+      margin-top: 30px;
+
+    }
+    .navbar {
+      background: linear-gradient(90deg, #1e3a8a, #2563eb);
+      box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1rem 2rem;
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+    }
+
+    .navbar h1 {
+      color: white;
+      font-size: 1.8rem;
+      cursor: pointer;
+    }
+
+    .navbar ul {
+      list-style: none;
+      display: flex;
+      gap: 1.5rem;
+    }
+
+    .navbar ul li a {
+      text-decoration: none;
+      color: white;
+      font-weight: 600;
+      padding: 0.5rem 0.8rem;
+      border-radius: 6px;
+      transition: background-color 0.3s ease;
+    }
+
+    .navbar ul li a:hover {
+      background-color: rgba(255, 255, 255, 0.25);
+    }
+
+    .form-toggle {
+      display: flex;
+      justify-content: center;
+      margin-top: 30px;
+    }
+
+    .form-toggle button {
+      padding: 10px 20px;
+      margin: 0 10px;
+      border: none;
+      background-color: #007BFF;
+      color: white;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+    .form-toggle button.active {
+      background-color: #0056b3;
+    }
+
+    .login-form {
+      background-color: white;
+      max-width: 500px;
+      margin: 30px auto;
+      padding: 30px;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      display: none;
+    }
+
+    .login-form.active {
+      display: block;
+    }
+
+    .login-form h3 {
+      margin-bottom: 20px;
+      color: #007BFF;
+      text-align: center;
+    }
+
+    .login-form label {
+      display: block;
+      margin-bottom: 5px;
+      color: #333;
+    }
+
+    .login-form input {
+      width: 100%;
+      padding: 10px;
+      margin-bottom: 15px;
+      border-radius: 5px;
+      border: 1px solid #ccc;
+    }
+
+    .login-form button {
+      width: 100%;
+      padding: 10px;
+      background-color: #007BFF;
+      border: none;
+      color: white;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+    /* Loader */
+    #loader-wrapper {
+      position: fixed;
+      width: 100%;
+      height: 100vh;
+      background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 9999;
+    }
+
+    .loader {
+      border: 8px solid #f3f3f3;
+      border-top: 8px solid #00c6ff;
+      border-radius: 50%;
+      width: 60px;
+      height: 60px;
+      animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    /* Footer */
+    .footer {
+      background-color: #f3f4f6;
+      padding: 2rem 1rem;
+      text-align: center;
+      color: #6b7280;
+      font-size: 0.9rem;
+      box-shadow: inset 0 1px 0 rgba(0,0,0,0.05);
+      margin-top: 6rem;
+    }
+
+    .footer a {
+      color: #3b82f6;
+      text-decoration: none;
+      font-weight: 600;
+      margin: 0 0.5rem;
+    }
+
+    .footer a:hover {
+      text-decoration: underline;
+    }
+  </style>
+
+  <script>
+        if (localStorage.getItem("access_token")) {
+            window.location.href = "index.html";
+        }
+    </script>
+</head>
+<body>
+  <!-- Navbar -->
+  <nav class="navbar">
+    <h1>NextHire</h1>
+    <ul>
+      <li><a href="index.html">Home</a></li>
+      <li><a href="signup.html">Sign Up</a></li>
+      <li><a href="login.html">Login</a></li>
+    </ul>
+  </nav>
+
+  <!-- Toggle Buttons -->
+  <div class="form-toggle">
+    <button id="candidateLoginBtn" class="active" onclick="toggleLogin('candidate')">Candidate Login</button>
+    <button id="hrLoginBtn" onclick="toggleLogin('hr')">HR Login</button>
+  </div>
+
+  <!-- Candidate Login Form -->
+  <form class="login-form active" id="candidateLoginForm">
+    <h3>Candidate Login</h3>
+    <label for="cand-login-email">Email</label>
+    <input type="email" id="cand-login-email" placeholder="Enter your email" required>
+
+    <label for="cand-login-password">Password</label>
+    <input type="password" id="cand-login-password" placeholder="Enter your password" required>
+
+    <button type="submit">Login as Candidate</button>
+  </form>
+
+  <!-- HR Login Form -->
+  <form class="login-form" id="hrLoginForm">
+    <h3>HR Login</h3>
+    <label for="hr-login-email">Email</label>
+    <input type="email" id="hr-login-email" placeholder="Enter your email" required>
+
+    <label for="hr-login-password">Password</label>
+    <input type="password" id="hr-login-password" placeholder="Enter your password" required>
+
+    <button type="submit">Login as HR</button>
+  </form>
+
+  <!-- Loader -->
+  <div id="loader-wrapper">
+    <div class="loader"></div>
+  </div>
+
+  <!-- Footer -->
+   <div class="footspacing"></div>
+  <footer class="footer">
+    <p>© 2025 NextHire. All rights reserved.</p>
+    <p>
+      <a href="privacy.html">Privacy Policy</a> |
+      <a href="terms.html">Terms of Service</a> |
+      <a href="contact.html">Contact</a>
+    </p>
+  </footer>
+
+  <!-- JS -->
+  <script>
+    function toggleLogin(type) {
+      const candForm = document.getElementById("candidateLoginForm");
+      const hrForm = document.getElementById("hrLoginForm");
+      const candBtn = document.getElementById("candidateLoginBtn");
+      const hrBtn = document.getElementById("hrLoginBtn");
+
+      if (type === "candidate") {
+        candForm.classList.add("active");
+        hrForm.classList.remove("active");
+        candBtn.classList.add("active");
+        hrBtn.classList.remove("active");
+      } else {
+        hrForm.classList.add("active");
+        candForm.classList.remove("active");
+        hrBtn.classList.add("active");
+        candBtn.classList.remove("active");
+      }
+    }
+
+    document.getElementById("candidateLoginForm").addEventListener("submit", async function (e) {
+      e.preventDefault();
+      const email = document.getElementById("cand-login-email").value;
+      const password = document.getElementById("cand-login-password").value;
+
+      const formData = new URLSearchParams();
+      formData.append("username", email);
+      formData.append("password", password);
+
+      try {
+        const response = await fetch("http://localhost:8000/auth/candidate/login", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/x-www-form-urlencoded"
+          },
+          body: formData
+        });
+
+        if (!response.ok) {
+          const errorData = await response.json();
+          alert("Login failed: " + (errorData.detail || "Unknown error"));
+          return;
+        }
+
+        const data = await response.json();
+        localStorage.setItem("access_token", data.access_token);
+        
+        localStorage.setItem("user_id", data.user_id);
+        localStorage.setItem("user_name", data.user_name);
+        localStorage.setItem("role", data.role);
+        alert("Candidate logged in successfully!");
+        window.location.href = "userdashboard.html";
+
+      } catch (err) {
+        console.error("Candidate login error:", err);
+        alert("Error logging in.");
+      }
+    });
+
+    document.getElementById("hrLoginForm").addEventListener("submit", async function (e) {
+      e.preventDefault();
+      const email = document.getElementById("hr-login-email").value;
+      const password = document.getElementById("hr-login-password").value;
+
+      const formData = new URLSearchParams();
+      formData.append("username", email);
+      formData.append("password", password);
+
+      try {
+        const response = await fetch("http://localhost:8000/auth/company/login", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/x-www-form-urlencoded"
+          },
+          body: formData
+        });
+
+        if (!response.ok) {
+          const errorData = await response.json();
+          alert("Login failed: " + (errorData.detail || "Unknown error"));
+          return;
+        }
+
+        const data = await response.json();
+        localStorage.setItem("access_token", data.access_token);
+        localStorage.setItem("hr_id", data.user_id);
+        localStorage.setItem("user_name", data.user_name);
+        localStorage.setItem("role", data.role);
+        console.log(data.user_id)
+        alert("HR logged in successfully!");
+        window.location.href = "hr_dashboard.html";
+
+      } catch (err) {
+        console.error("HR login error:", err);
+        alert("Error logging in.");
+      }
+    });
+
+    window.addEventListener("load", () => {
+      const loaderWrapper = document.getElementById("loader-wrapper");
+      loaderWrapper.style.opacity = '0';
+      setTimeout(() => {
+        loaderWrapper.style.display = 'none';
+      }, 500);
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>OTP Verification - NextHire</title>
+  <link rel="stylesheet" href="styles.css" />
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #a8d0ff 0%, #ffffff 100%);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .navbar {
+      background: linear-gradient(90deg, #1e3a8a, #2563eb);
+      padding: 1rem 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+
+    .navbar h1 {
+      margin: 0;
+      font-size: 1.8rem;
+      color: white;
+    }
+
+    .navbar nav a {
+      margin-left: 1rem;
+      color: #007BFF;
+      text-decoration: none;
+      font-weight: 600;
+    }
+
+    .navbar nav a:hover {
+      text-decoration: underline;
+    }
+
+    .otp-container {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem;
+      text-align: center;
+    }
+
+    .otp-container h2 {
+      margin-bottom: 0.5rem;
+      color: #333;
+    }
+
+    .otp-container p {
+      margin-bottom: 1rem;
+      color: #555;
+    }
+
+    .otp-input {
+      display: flex;
+      gap: 10px;
+      justify-content: center;
+      margin-bottom: 1.5rem;
+    }
+
+    .otp-input input {
+      width: 50px;
+      height: 60px;
+      font-size: 24px;
+      text-align: center;
+      border-radius: 10px;
+      border: 1px solid #ccc;
+      transition: border-color 0.2s;
+    }
+
+    .otp-input input:focus {
+      border-color: #007BFF;
+      outline: none;
+    }
+
+    .verify-btn {
+      padding: 12px 36px;
+      background: #007BFF;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+
+    .verify-btn:hover {
+      background: #0056b3;
+    }
+
+    .footer {
+      background-color: #f3f4f6;
+      padding: 1rem;
+      text-align: center;
+      color: #6b7280;
+      font-size: 0.9rem;
+      box-shadow: inset 0 1px 0 rgba(0,0,0,0.05);
+    }
+
+    .footer a {
+      color: #3b82f6;
+      text-decoration: none;
+      font-weight: 600;
+      margin: 0 0.5rem;
+    }
+
+    .footer a:hover {
+      text-decoration: underline;
+    }
+
+    @media screen and (max-width: 500px) {
+      .otp-input input {
+        width: 40px;
+        height: 50px;
+        font-size: 20px;
+      }
+    }
+  </style>
+    <script>
+        if (localStorage.getItem("access_token")) {
+            window.location.href = "index.html";
+        }
+    </script>
+</head>
+<body>
+
+  <!-- Navbar -->
+  <div class="navbar">
+    <h1>NextHire</h1>
+    
+  </div>
+
+  <!-- OTP Section -->
+  <div class="otp-container">
+    <h2>Verify OTP</h2>
+    <p>Enter the 6-digit code sent to your email</p>
+    <div class="otp-input">
+      <input type="text" maxlength="1" />
+      <input type="text" maxlength="1" />
+      <input type="text" maxlength="1" />
+      <input type="text" maxlength="1" />
+      <input type="text" maxlength="1" />
+      <input type="text" maxlength="1" />
+    </div>
+    <button class="verify-btn">Verify</button>
+  </div>
+
+  <!-- Footer -->
+  <div class="footer">
+    &copy; 2025 NextHire. All rights reserved.
+    <p>
+      <a href="privacy.html">Privacy Policy</a> |
+      <a href="terms.html">Terms of Service</a> |
+      <a href="contact.html">Contact</a>
+    </p>
+  </div>
+
+  <!-- Script -->
+  <script>
+    // OTP input behavior
+    const inputs = document.querySelectorAll(".otp-input input");
+
+    inputs.forEach((input, index) => {
+      input.addEventListener("input", (e) => {
+        const value = e.target.value;
+        if (value.length === 1 && index < inputs.length - 1) {
+          inputs[index + 1].focus();
+        }
+        if (value.length > 1) {
+          const vals = value.split('');
+          for (let i = 0; i < vals.length && i < inputs.length; i++) {
+            inputs[i].value = vals[i];
+          }
+          inputs[Math.min(vals.length, inputs.length) - 1].focus();
+        }
+      });
+
+      input.addEventListener("keydown", (e) => {
+        if (e.key === "Backspace" && !input.value && index > 0) {
+          inputs[index - 1].focus();
+        }
+      });
+
+      input.addEventListener("paste", (e) => {
+        e.preventDefault();
+        const pasteData = e.clipboardData.getData("text").slice(0, 6).split('');
+        inputs.forEach((input, i) => input.value = pasteData[i] || '');
+        inputs[pasteData.length - 1]?.focus();
+      });
+    });
+
+    // Verify button logic
+    document.querySelector(".verify-btn").addEventListener("click", async () => {
+      let otp = Array.from(inputs).map(input => input.value).join('');
+
+      const role = localStorage.getItem("signup_role");
+      const data = JSON.parse(localStorage.getItem("signup_data"));
+
+      if (!role || !data) {
+        alert("Missing signup data. Please restart.");
+        window.location.href = "signup.html";
+        return;
+      }
+
+      const payload = {
+        data: data,
+        otp_data: {
+          email: data.email,
+          otp: otp
+        }
+      };
+
+      const endpoint = role === "candidate"
+        ? "http://localhost:8000/auth/candidate/signup"
+        : "http://localhost:8000/auth/company/signup";
+
+      const res = await fetch(endpoint, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload)
+      });
+
+      if (res.ok) {
+        alert("Signup successful!");
+        localStorage.clear();
+        window.location.href = "login.html";
+      } else {
+        const err = await res.json();
+        alert("Signup failed: " + (err.detail || "Unknown error"));
+      }
+    });
+  </script>
+
+</body>
+</html>

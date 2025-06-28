@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Job Recommendations</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f1f5f9;
+      margin: 0;
+      padding: 0;
+    }
+    .navbar {
+      background: #2563eb;
+      padding: 15px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      color: #fff;
+    }
+    .navbar h1 {
+      margin: 0;
+      font-size: 24px;
+    }
+    .navbar ul {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+      display: flex;
+    }
+    .navbar ul li {
+      margin-left: 20px;
+    }
+    .navbar ul li a {
+      color: #fff;
+      text-decoration: none;
+      font-weight: 500;
+      transition: color 0.2s;
+    }
+    .navbar ul li a:hover {
+      color: #e5e7eb;
+    }
+    .container {
+      max-width: 900px;
+      margin: 40px auto;
+      padding: 24px;
+      background: #fff;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.08);
+    }
+    h2 {
+      color: #000000;
+      margin-bottom: 18px;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 12px;
+    }
+    th, td {
+      padding: 12px 15px;
+      border: 1px solid #e5e7eb;
+      text-align: left;
+    }
+    th {
+      background: #2563eb;
+      color: #fff;
+      font-weight: 600;
+    }
+    tr:nth-child(even) {
+      background: #f8fafc;
+    }
+    .error {
+      color: red;
+      margin: 30px 0;
+      text-align: center;
+      font-weight: 600;
+    }
+    .yes {
+      color: #059669;
+      font-weight: bold;
+    }
+    .no {
+      color: #dc2626;
+      font-weight: bold;
+    }
+    button {
+      background: #2563eb;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      padding: 7px 14px;
+      cursor: pointer;
+      font-weight: 500;
+      transition: background 0.2s;
+    }
+    button:hover {
+      background: #1e40af;
+    }
+  </style>
+  <script>
+    if (!localStorage.getItem("hr_id") || !localStorage.getItem("access_token")) {
+      window.location.href = "login.html";
+    }
+  </script>
+</head>
+<body>
+  <nav class="navbar">
+    <h1>NextHire</h1>
+    <ul>
+      <li><a href="hr_dashboard.html">Dashboard</a></li>
+    </ul>
+  </nav>
+
+  <div class="container">
+    <h2 id="job-recommendation-title">Job Recommendations for: Loading...</h2>
+    <div id="error" class="error" style="display: none;"></div>
+    <table id="recommendation-table" style="display: none;">
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Phone</th>
+          <th>Email</th>
+          <th>Comment</th>
+          <th>Recommended</th>
+        </tr>
+      </thead>
+      <tbody id="table-body"></tbody>
+    </table>
+  </div>
+
+  <script>
+    function getQueryParam(param) {
+      const urlParams = new URLSearchParams(window.location.search);
+      return urlParams.get(param);
+    }
+
+    // Function to sanitize text to prevent XSS
+    function sanitizeText(text) {
+      const div = document.createElement('div');
+      div.textContent = text;
+      return div.innerHTML;
+    }
+
+    const jobId = getQueryParam('id');
+    const jobTitle = getQueryParam('title');
+    let token = "";
+    try {
+      token = localStorage.getItem("access_token") || "";
+    } catch (e) {
+      console.error("Error accessing localStorage:", e);
+    }
+
+    // Display job title
+    const titleElement = document.getElementById('job-recommendation-title');
+    titleElement.textContent = `Job Recommendations for: ${jobTitle ? sanitizeText(decodeURIComponent(jobTitle)) : 'Unknown Job'}`;
+
+    async function fetchRecommendations() {
+      const errorDiv = document.getElementById('error');
+      const table = document.getElementById('recommendation-table');
+      const tbody = document.getElementById('table-body');
+      errorDiv.style.display = "none";
+      table.style.display = "none";
+      tbody.innerHTML = "";
+
+      if (!jobId) {
+        errorDiv.textContent = "No Job ID provided in URL.";
+        errorDiv.style.display = "block";
+        return;
+      }
+
+      try {
+        const res = await fetch(`http://localhost:8000/hr_apis/job-recommendations?job_id=${jobId}`, {
+          headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' }
+        });
+        console.log('Response status:', res.status);
+
+        if (!res.ok) {
+          const errorText = await res.text();
+          console.log('Error response:', errorText);
+          throw new Error("Could not fetch recommendations");
+        }
+
+        const data = await res.json();
+        console.log('Response data:', data);
+
+        if (!Array.isArray(data) || data.length === 0) {
+          errorDiv.textContent = "No recommendations found for this job.";
+          errorDiv.style.display = "block";
+          return;
+        }
+
+        for (const rec of data) {
+          const tr = document.createElement('tr');
+          tr.innerHTML = `
+            <td>${sanitizeText(rec.candidate_name || '-')}</td>
+            <td>${sanitizeText(rec.candidate_phone || '-')}</td>
+            <td>${sanitizeText(rec.candidate_email || '-')}</td>
+            <td>${sanitizeText(rec.comment || '-')}</td>
+            <td class="${rec.hire_decision ? 'yes' : 'no'}">
+              ${rec.hire_decision ? 'Yes' : 'No'}
+            </td>
+          `;
+          tbody.appendChild(tr);
+        }
+        table.style.display = "table";
+      } catch (err) {
+        console.error('Fetch error:', err);
+        errorDiv.textContent = "There are no AI-recommended candidates yet.";
+        errorDiv.style.display = "block";
+      }
+    }
+
+    fetchRecommendations();
+  </script>
+</body>
+</html>

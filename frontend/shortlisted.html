@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Final Shortlisted Candidates</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #a8d0ff 0%, #ffffff 100%);
+    }
+    .navbar {
+      background: linear-gradient(90deg, #1e3a8a, #2563eb);
+      box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0.5rem 1rem;
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+    }
+    .navbar h1 {
+      color: white;
+      font-size: 1.8rem;
+      cursor: pointer;
+      margin: 0;
+    }
+    .navbar ul {
+      list-style: none;
+      display: flex;
+      gap: 1.5rem;
+      margin: 0;
+      padding: 0;
+    }
+    .navbar ul li a {
+      text-decoration: none;
+      color: white;
+      font-weight: 600;
+      padding: 0.5rem 0.8rem;
+      border-radius: 6px;
+      transition: background-color 0.3s ease;
+    }
+    .navbar ul li a:hover {
+      background-color: rgba(255, 255, 255, 0.25);
+    }
+    .container {
+      max-width: 800px;
+      margin: 40px auto;
+      padding: 24px;
+      background: #fff;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.08);
+    }
+    h2 {
+      color: #2563eb;
+      margin-bottom: 18px;
+      text-align: center;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 12px;
+    }
+    th, td {
+      padding: 12px 15px;
+      border: 1px solid #e5e7eb;
+      text-align: left;
+    }
+    th {
+      background: #2563eb;
+      color: #fff;
+      font-weight: 600;
+    }
+    tr:nth-child(even) {
+      background: #f8fafc;
+    }
+    button {
+      background: #2563eb;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      padding: 7px 14px;
+      cursor: pointer;
+      font-weight: 500;
+      transition: background 0.2s;
+    }
+    button:hover {
+      background: #1e40af;
+    }
+    .error {
+      color: red;
+      margin: 30px 0;
+      text-align: center;
+      font-weight: 600;
+    }
+  </style>
+</head>
+<body>
+  <!-- Page Protection -->
+   <script>
+        if (!localStorage.getItem("hr_id") || !localStorage.getItem("access_token")) {
+            window.location.href = "login.html";
+        }
+    </script>
+  <nav class="navbar">
+    <h1>NextHire</h1>
+    <ul>
+      <li><a href="hr_dashboard.html">Dashboard</a></li>
+      <li><a href="#" id="logoutLink">Logout</a></li>
+    </ul>
+  </nav>
+
+  <div class="container">
+    <h2 id="page-title">Final Shortlisted Candidates</h2>
+    <div id="error" class="error" style="display: none;"></div>
+    <table id="shortlisted-table" style="display: none;">
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Email</th>
+          <th>Candidate ID</th>
+          <th>Email Sent</th>
+          <th>Score</th>
+        </tr>
+      </thead>
+      <tbody id="table-body">
+        <!-- Dynamic rows go here -->
+      </tbody>
+    </table>
+  </div>
+
+  <script>
+    // Utility to get job ID from URL (?id=...)
+    function getQueryParam(param) {
+      const urlParams = new URLSearchParams(window.location.search);
+      return urlParams.get(param);
+    }
+
+   const jobId = getQueryParam('id');
+    const title = getQueryParam('title');
+    document.getElementById('page-title').textContent = `Applicants for Job ID: ${title ? title : 'N/A'}`;
+
+    async function fetchShortlistedCandidates() {
+      if (!jobId) {
+        showError("Job ID is missing in the URL.");
+        return;
+      }
+      const token = localStorage.getItem('access_token');
+      if (!token) {
+        showError("You are not authorized. Please login again.");
+        setTimeout(() => {
+          window.location.href = 'login.html';
+        }, 1500);
+        return;
+      }
+      try {
+        const res = await fetch(`http://localhost:8000/hr_apis/job/${jobId}/final-shortlisted-candidates`, {
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          }
+        });
+        if (!res.ok) {
+          showError("Could not fetch shortlisted candidates. Please try again.");
+          return;
+        }
+        const candidates = await res.json();
+        renderTable(candidates);
+      } catch (err) {
+        showError("Network error. Please try again.");
+        console.error('Fetch error:', err);
+      }
+    }
+
+    function renderTable(candidates) {
+      const table = document.getElementById('shortlisted-table');
+      const tbody = document.getElementById('table-body');
+      tbody.innerHTML = '';
+
+      if (!candidates || candidates.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;color:#888;">No shortlisted candidates found.</td></tr>';
+        table.style.display = '';
+        return;
+      }
+
+      candidates.forEach(candidate => {
+        const row = document.createElement('tr');
+        row.innerHTML = `
+          <td>${candidate.candidate_name || 'N/A'}</td>
+          <td>${candidate.candidate_email || 'N/A'}</td>
+          <td>${candidate.candidate_id || 'N/A'}</td>
+          <td>${candidate.sent_email ? 'Yes' : 'No'}</td>
+          <td>${candidate.score || 'N/A'}</td>
+        `;
+        tbody.appendChild(row);
+      });
+
+      table.style.display = '';
+    }
+
+    function showError(msg) {
+      const errDiv = document.getElementById('error');
+      errDiv.textContent = msg;
+      errDiv.style.display = '';
+      document.getElementById('shortlisted-table').style.display = 'none';
+    }
+
+    // Logout function
+    document.getElementById('logoutLink').onclick = function(e) {
+      e.preventDefault();
+      localStorage.removeItem("access_token");
+      localStorage.clear();
+      window.location.href = "login.html";
+    };
+
+    // Fetch candidates on page load
+    document.addEventListener('DOMContentLoaded', fetchShortlistedCandidates);
+  </script>
+</body>
+</html>

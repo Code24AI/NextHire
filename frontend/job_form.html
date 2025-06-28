@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Candidate Application Form - NextHire</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f6f8;
+            color: #333;
+        }
+        /* Navbar */
+        .navbar {
+            background-color: #1976d2;
+            color: white;
+            padding: 10px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 1000;
+            box-sizing: border-box;
+        }
+        .navbar .logo {
+            font-size: 1.5em;
+            font-weight: bold;
+        }
+        .navbar .nav-links {
+            display: flex;
+            align-items: center;
+        }
+        .navbar .nav-links a,
+        .navbar .nav-links button {
+            color: white;
+            margin-left: 20px;
+            text-decoration: none;
+            font-size: 1em;
+            white-space: nowrap;
+            cursor: pointer;
+            background: none;
+            border: none;
+            font-family: inherit;
+            padding: 0;
+        }
+        .navbar .nav-links a:hover,
+        .navbar .nav-links button:hover {
+            text-decoration: underline;
+        }
+        /* Main Content */
+        .container {
+            max-width: 1200px;
+            margin: 80px auto 20px;
+            padding: 20px;
+        }
+        /* Form Container */
+        .form-container {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .form-container h2 {
+            margin-top: 0;
+            color: #1976d2;
+            text-align: center;
+        }
+        .form-container form {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+        .form-field {
+            margin-bottom: 10px;
+        }
+        .form-field label {
+            font-weight: bold;
+            color: #1976d2;
+            display: block;
+            margin-bottom: 5px;
+        }
+        .form-field input,
+        .form-field textarea {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-sizing: border-box;
+            font-size: 1em;
+        }
+        .form-field textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+        .form-field.full-width {
+            grid-column: span 2;
+        }
+        .form-container button {
+            grid-column: span 2;
+            background-color: #1976d2;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 1em;
+            margin-top: 20px;
+        }
+        .form-container button:hover {
+            background-color: #1565c0;
+        }
+        .error {
+            color: red;
+            text-align: center;
+            margin: 10px 0;
+            grid-column: span 2;
+        }
+        /* Responsive Design */
+        @media (max-width: 600px) {
+            .navbar .nav-links {
+                flex-direction: column;
+                position: absolute;
+                top: 60px;
+                right: 20px;
+                background-color: #1976d2;
+                padding: 10px;
+                display: none;
+            }
+            .navbar .nav-links.active {
+                display: flex;
+            }
+            .navbar .nav-links a,
+            .navbar .nav-links button {
+                margin: 10px 0;
+            }
+            .container {
+                margin-top: 120px;
+            }
+            .form-container form {
+                grid-template-columns: 1fr;
+            }
+            .form-field.full-width {
+                grid-column: span 1;
+            }
+            .form-container button {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Page Protection -->
+    <script>
+        if (!localStorage.getItem("user_id") || !localStorage.getItem("access_token")) {
+            window.location.href = "login.html";
+        }
+    </script>
+    <div class="navbar">
+        <div class="logo">NextHire</div>
+        <div class="nav-links" id="navLinks">
+            <a href="dashboard.html">Dashboard</a>
+            <button id="interviewBtn">Interview</button>
+            <a href="profile.html">Profile</a>
+            <a href="#" id="logoutLink">Logout</a>
+        </div>
+    </div>
+    <div class="container">
+        <div class="form-container">
+            <h2>Candidate Application Form</h2>
+            <div id="errorMsg" class="error"></div>
+            <form id="candidate-form" autocomplete="off">
+                <div class="form-field">
+                    <label>Name</label>
+                    <input type="text" name="name" required>
+                </div>
+                <div class="form-field">
+                    <label>Email</label>
+                    <input type="email" name="email" required>
+                </div>
+                <div class="form-field">
+                    <label>Phone</label>
+                    <input type="text" name="phone" required>
+                </div>
+                <div class="form-field">
+                    <label>Address</label>
+                    <input type="text" name="address">
+                </div>
+                <div class="form-field">
+                    <label>Highest Education</label>
+                    <input type="text" name="highest_education">
+                </div>
+                <div class="form-field">
+                    <label>Institution</label>
+                    <input type="text" name="institution">
+                </div>
+                <div class="form-field">
+                    <label>Graduation Year</label>
+                    <input type="text" name="graduation_year">
+                </div>
+                <div class="form-field">
+                    <label>CGPA</label>
+                    <input type="text" name="cgpa">
+                </div>
+                <div class="form-field full-width">
+                    <label>Skills</label>
+                    <textarea name="skills"></textarea>
+                </div>
+                <div class="form-field">
+                    <label>Previous Company</label>
+                    <input type="text" name="previous_company">
+                </div>
+                <div class="form-field">
+                    <label>Positions</label>
+                    <input type="text" name="positions">
+                </div>
+                <div class="form-field full-width">
+                    <label>Responsibilities</label>
+                    <textarea name="responsibilities"></textarea>
+                </div>
+                <div class="form-field">
+                    <label>Experience Years</label>
+                    <input type="text" name="experience_years">
+                </div>
+                <div class="form-field full-width">
+                    <label>Projects Description</label>
+                    <textarea name="projects_description"></textarea>
+                </div>
+                <div class="form-field full-width">
+                    <label>Project Tech Stack</label>
+                    <textarea name="project_techstack"></textarea>
+                </div>
+                <div class="form-field">
+                    <label>Project Link</label>
+                    <input type="url" name="project_link">
+                </div>
+                <div class="form-field">
+                    <label>LinkedIn</label>
+                    <input type="url" name="linkedin">
+                </div>
+                <div class="form-field">
+                    <label>GitHub</label>
+                    <input type="url" name="github">
+                </div>
+                <div class="form-field">
+                    <label>Current Status</label>
+                    <input type="text" name="current_status">
+                </div>
+                <div class="form-field full-width">
+                    <label>Strength</label>
+                    <textarea name="strength"></textarea>
+                </div>
+                <div class="form-field full-width">
+                    <label>Weakness</label>
+                    <textarea name="weakness"></textarea>
+                </div>
+                <div class="form-field">
+                    <label>When You Can Join</label>
+                    <input type="text" name="when_you_can_join">
+                </div>
+                <button type="submit">Submit Application</button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE_URL = 'http://127.0.0.1:8000';
+        const accessToken = localStorage.getItem('access_token');
+        const userId = localStorage.getItem('user_id');
+
+        // Get query parameter
+        function getQueryParam(param) {
+            const urlParams = new URLSearchParams(window.location.search);
+            return urlParams.get(param);
+        }
+
+        // Fetch Candidate Data to Prefill Form
+        async function fetchCandidateData() {
+            try {
+                const response = await fetch(`${API_BASE_URL}/user_apis/candidates/${userId}`, {
+                    headers: {
+                        'Authorization': `Bearer ${accessToken}`
+                    }
+                });
+                if (!response.ok) {
+                    throw new Error('Failed to fetch candidate data');
+                }
+                const data = await response.json();
+                prefillForm(data);
+            } catch (error) {
+                document.getElementById('errorMsg').textContent = 'Error loading candidate data';
+                console.error('Error fetching candidate data:', error);
+            }
+        }
+
+        // Prefill Form Fields
+        function prefillForm(data) {
+            const fields = [
+                'name', 'email', 'phone', 'address', 'highest_education', 'institution',
+                'graduation_year', 'cgpa', 'skills', 'previous_company', 'positions',
+                'responsibilities', 'experience_years', 'projects_description',
+                'project_techstack', 'project_link', 'linkedin', 'github',
+                'current_status', 'strength', 'weakness', 'when_you_can_join'
+            ];
+            fields.forEach(field => {
+                const element = document.querySelector(`[name="${field}"]`);
+                if (element) {
+                    element.value = data[field] || '';
+                }
+            });
+        }
+
+        // Form Submission
+        document.getElementById('candidate-form').addEventListener('submit', async function(event) {
+            event.preventDefault();
+
+            const job_post_id = Number(getQueryParam('id')) || 0;
+            const user_id = Number(localStorage.getItem('user_id')) || 0;
+
+            const formData = new FormData(event.target);
+            const data = {
+                job_post_id: job_post_id,
+                id: user_id,
+                name: formData.get('name') || "",
+                phone: formData.get('phone') || "",
+                email: formData.get('email') || "",
+                address: formData.get('address') || "",
+                highest_education: formData.get('highest_education') || "",
+                institution: formData.get('institution') || "",
+                graduation_year: formData.get('graduation_year') || "",
+                cgpa: formData.get('cgpa') || "",
+                skills: formData.get('skills') || "",
+                previous_company: formData.get('previous_company') || "",
+                positions: formData.get('positions') || "",
+                responsibilities: formData.get('responsibilities') || "",
+                experience_years: formData.get('experience_years') || "",
+                projects_description: formData.get('projects_description') || "",
+                project_techstack: formData.get('project_techstack') || "",
+                project_link: formData.get('project_link') || "",
+                linkedin: formData.get('linkedin') || "",
+                github: formData.get('github') || "",
+                current_status: formData.get('current_status') || "",
+                strength: formData.get('strength') || "",
+                weakness: formData.get('weakness') || "",
+                when_you_can_join: formData.get('when_you_can_join') || ""
+            };
+
+            try {
+                const res = await fetch(`${API_BASE_URL}/form_scoring/user_form`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${accessToken}`
+                    },
+                    body: JSON.stringify(data)
+                });
+                if (res.ok) {
+                    alert("Application submitted successfully!");
+                    window.location.href = 'userdashboard.html';
+                } else {
+                    const errorData = await res.json().catch(() => ({}));
+                    document.getElementById('errorMsg').textContent = "Submission failed: " + (errorData.message || res.statusText);
+                }
+            } catch (err) {
+                document.getElementById('errorMsg').textContent = "An error occurred. Please try again later.";
+                console.error('Submission error:', err);
+            }
+        });
+
+        // Initialize Page
+        document.addEventListener('DOMContentLoaded', () => {
+            fetchCandidateData();
+
+            // Interview Button
+            document.getElementById('interviewBtn').onclick = function() {
+                window.location.href = "interviewbefore.html";
+            };
+
+            // Logout
+            document.getElementById('logoutLink').onclick = function(e) {
+                e.preventDefault();
+                localStorage.removeItem("user_id");
+                localStorage.removeItem("access_token");
+                localStorage.clear();
+                window.location.href = "login.html";
+            };
+        });
+    </script>
+</body>
+</html>

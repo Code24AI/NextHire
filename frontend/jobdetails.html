@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Job Details - NextHire</title>
+  <style>
+    :root {
+      --primary-color: #3b82f6;
+      --primary-color-dark: #2563eb;
+      --secondary-color: #6b7280;
+      --background-color: #f8f9fa;
+      --text-color: #1a1a1a;
+      --shadow: 0 2px 8px rgba(0,0,0,0.1);
+      --border-radius: 15px;
+      --font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+   
+    
+
+
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html, body {
+      height: 100%;
+    }
+
+    body {
+      font-family: var(--font-family);
+    
+
+      color: var(--text-color);
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+    }
+
+    .navbar {
+      background: linear-gradient(90deg, #1e3a8a, #2563eb);
+      box-shadow: var(--shadow);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1rem 2rem;
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+    }
+
+    .navbar h1 {
+      color: white;
+      font-size: 1.8rem;
+      cursor: pointer;
+      user-select: none;
+      font-weight: 700;
+      letter-spacing: 1px;
+    }
+
+    .navbar ul {
+      list-style: none;
+      display: flex;
+      gap: 1.5rem;
+    }
+
+    .navbar ul li a {
+      text-decoration: none;
+      color: white;
+      font-weight: 600;
+      padding: 0.5rem 0.8rem;
+      border-radius: 6px;
+      transition: background-color 0.3s ease;
+    }
+
+    .navbar ul li a:hover,
+    .navbar ul li a:focus {
+      background-color: rgba(255, 255, 255, 0.25);
+    }
+
+    .main-content {
+      max-width: 900px;
+      margin: 2rem auto;
+      padding: 0 1rem;
+      flex: 1;
+    }
+
+    h1 {
+      color: var(--primary-color);
+      margin-bottom: 0.5rem;
+    }
+
+    .company-location {
+      color: #555;
+      margin-bottom: 1rem;
+      font-weight: 600;
+    }
+
+    .section {
+      margin-bottom: 1.5rem;
+    }
+
+    .section h2 {
+      color: var(--primary-color-dark);
+      margin-bottom: 0.5rem;
+      font-size: 1.3rem;
+    }
+
+    ul {
+      padding-left: 1.2rem;
+    }
+
+    .apply-btn {
+      background-color: var(--primary-color);
+      color: white;
+      font-weight: 700;
+      padding: 12px 28px;
+      border: none;
+      border-radius: 50px;
+      cursor: pointer;
+      font-size: 1.1rem;
+      box-shadow: 0 8px 15px rgba(59,130,246,0.3);
+      transition: background-color 0.3s ease;
+      margin-top: 1rem;
+    }
+
+    .apply-btn:hover {
+      background-color: var(--primary-color-dark);
+    }
+
+    .apply-btn:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+
+    .error {
+      color: red;
+      font-weight: 600;
+      padding: 2rem;
+      text-align: center;
+    }
+
+    .footer {
+      background-color: #e5e7eb;
+      padding: 2rem 1rem;
+      text-align: center;
+      color: var(--secondary-color);
+      font-size: 0.9rem;
+      border-top: 1px solid #d1d5db;
+      box-shadow: 0 -2px 6px rgba(0,0,0,0.05);
+    }
+
+    .footer a {
+      color: var(--primary-color);
+      text-decoration: none;
+      font-weight: 600;
+      margin: 0 0.5rem;
+    }
+
+    .footer a:hover,
+    .footer a:focus {
+      text-decoration: underline;
+    }
+  </style>
+  <script>
+        if (!localStorage.getItem("user_id") || !localStorage.getItem("access_token")) {
+            window.location.href = "login.html";
+        }
+    </script>
+</head>
+<body>
+  <nav class="navbar">
+    <h1 onclick="location.href='index.html'">NextHire</h1>
+    <ul>
+      <li><a href="index.html">Home</a></li>
+      
+    </ul>
+  </nav>
+
+  <div class="main-content">
+    <button onclick="history.back()">← Back</button>
+    <h1 id="job-title">Loading...</h1>
+    <div class="company-location" id="company-location"></div>
+
+    <div class="section" id="description-section">
+      <h2>Description</h2>
+      <p id="description"></p>
+    </div>
+
+    <div class="section" id="responsibilities-section">
+      <h2>Responsibilities</h2>
+      <ul id="responsibilities"></ul>
+    </div>
+
+    <div class="section" id="requirements-section">
+      <h2>Requirements</h2>
+      <ul id="requirements"></ul>
+    </div>
+
+    <div class="section" id="benefits-section">
+      <h2>Benefits</h2>
+      <ul id="benefits"></ul>
+    </div>
+
+    <div class="section">
+      <strong>Experience Level:</strong> <span id="experience-level"></span><br/>
+      <strong>Job Type:</strong> <span id="job-type"></span><br/>
+      <strong>Salary Range:</strong> <span id="salary-range"></span><br/>
+      <strong>Location:</strong> <span id="location"></span><br/>
+    
+      <strong>Deadline:</strong> <span id="deadline"></span>
+    </div>
+
+    <button class="apply-btn" id="apply-btn">Apply</button>
+  </div>
+
+  <footer class="footer">
+    <p>© 2025 NextHire. All rights reserved.</p>
+    <p>
+      <a href="privacy.html">Privacy Policy</a> |
+      <a href="terms.html">Terms of Service</a> |
+      <a href="contact.html">Contact</a>
+    </p>
+  </footer>
+
+  <script>
+    function getQueryParam(param) {
+      const urlParams = new URLSearchParams(window.location.search);
+      return urlParams.get(param);
+    }
+
+    async function fetchJobDetails(id) {
+      try {
+        const res = await fetch(`http://localhost:8000/auth/jobs/${id}`);
+        if (!res.ok) throw new Error('Job not found');
+        const job = await res.json();
+
+        document.getElementById('job-title').textContent = job.title || 'No Title';
+        document.getElementById('company-location').textContent = `${job.company || 'Unknown Company'} - ${job.location || 'Location not specified'}`;
+        document.getElementById('description').textContent = job.description || 'No description provided.';
+
+        const arrToList = (arr, containerId) => {
+          const ul = document.getElementById(containerId);
+          ul.innerHTML = '';
+          if (Array.isArray(arr) && arr.length > 0) {
+            arr.forEach(item => {
+              const li = document.createElement('li');
+              li.textContent = item;
+              ul.appendChild(li);
+            });
+          } else {
+            ul.innerHTML = '<li>Not specified</li>';
+          }
+        };
+
+        arrToList(job.responsibilities, 'responsibilities');
+        arrToList(job.requirements, 'requirements');
+        arrToList(job.benefits, 'benefits');
+
+        document.getElementById('experience-level').textContent = job.experience_level || 'Not specified';
+        document.getElementById('job-type').textContent = job.job_type || 'Not specified';
+        document.getElementById('salary-range').textContent = job.salary_range || 'Not specified';
+        document.getElementById('location').textContent = job.location || 'Not specified';
+        
+        document.getElementById('deadline').textContent = job.deadline ? new Date(job.deadline).toLocaleDateString() : 'Not specified';
+
+        const applyBtn = document.getElementById('apply-btn');
+        if (job) {
+          applyBtn.disabled = false;
+          applyBtn.onclick = () => {
+  window.location.href = `job_form.html?id=${job.id}`;
+};
+        } else {
+          applyBtn.disabled = true;
+          applyBtn.textContent = 'Closed';
+        }
+      } catch (error) {
+        document.body.innerHTML = `<p class="error">Error loading job details: ${error.message}</p>`;
+      }
+    }
+
+    const jobId = getQueryParam('id');
+    if (jobId) {
+      fetchJobDetails(jobId);
+    } else {
+      document.body.innerHTML = '<p class="error">No job ID provided in URL.</p>';
+    }
+  </script>
+</body>
+</html>

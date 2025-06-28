@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Applicant List</title>
+  <link rel="stylesheet" href="style.css" />
+  <style>
+    .container {
+      max-width: 800px;
+      margin: 40px auto;
+      padding: 24px;
+      background: #fff;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.08);
+    }
+    h2 {
+      color: #2563eb;
+      margin-bottom: 18px;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 12px;
+    }
+    th, td {
+      padding: 12px 15px;
+      border: 1px solid #e5e7eb;
+      text-align: left;
+    }
+    th {
+      background: #2563eb;
+      color: #fff;
+      font-weight: 600;
+    }
+    tr:nth-child(even) {
+      background: #f8fafc;
+    }
+    button {
+      background: #2563eb;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      padding: 7px 14px;
+      cursor: pointer;
+      font-weight: 500;
+      transition: background 0.2s;
+    }
+    button:hover {
+      background: #1e40af;
+    }
+    .error {
+      color: red;
+      margin: 30px 0;
+      text-align: center;
+      font-weight: 600;
+    }
+  </style>
+   <script>
+        if (!localStorage.getItem("hr_id") || !localStorage.getItem("access_token")) {
+            window.location.href = "login.html";
+        }
+    </script>
+</head>
+<body>
+  <nav class="navbar">
+    <h1>NextHire</h1>
+    <ul>
+      <li><a href="hr_dashboard.html">Dashboard</a></li>
+    </ul>
+  </nav>
+
+  <div class="container">
+    <h2 id="page-title">Applicants</h2>
+    <div id="error" class="error" style="display: none;"></div>
+    <table id="applicant-table" style="display: none;">
+      <thead>
+        <tr>
+          <th>Candidate ID</th>
+          <th>Overall Score</th>
+          <th>Strength</th>
+          <th>Weakness</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody id="table-body">
+        <!-- Dynamic rows go here -->
+      </tbody>
+    </table>
+  </div>
+
+  <script>
+    // Utility to get job id from URL (?id=...)
+    function getQueryParam(param) {
+      const urlParams = new URLSearchParams(window.location.search);
+      return urlParams.get(param);
+    }
+const jobId = getQueryParam('id');
+    const title = getQueryParam('title');
+    document.getElementById('page-title').textContent = `Applicants for Job ID: ${title ? title : 'N/A'}`;
+
+    async function fetchApplicants() {
+      if (!jobId) {
+        showError("Job ID is missing in the URL.");
+        return;
+      }
+      const token = localStorage.getItem('access_token');
+      if (!token) {
+        showError("You are not authorized. Please login again.");
+        setTimeout(() => {
+          window.location.href = 'login.html';
+        }, 1500);
+        return;
+      }
+      try {
+        const res = await fetch(`http://localhost:8000/hr_apis/company/${jobId}/qa-scoring`, {
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          }
+        });
+        if (!res.ok) {
+          showError("Could not fetch applicants. Please try again.");
+          return;
+        }
+        const applicants = await res.json();
+        renderTable(applicants);
+      } catch (err) {
+        showError("Network error. Please try again.");
+      }
+    }
+
+    function renderTable(applicants) {
+      const table = document.getElementById('applicant-table');
+      const tbody = document.getElementById('table-body');
+      tbody.innerHTML = '';
+
+      if (!applicants || applicants.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;color:#888;">No applicants found.</td></tr>';
+        table.style.display = '';
+        return;
+      }
+
+      applicants.forEach(app => {
+        const row = document.createElement('tr');
+        row.innerHTML = `
+          <td>${app.candidate_id || 'N/A'}</td>
+          <td>${typeof app.overall_score !== 'undefined' ? app.overall_score : 'N/A'}</td>
+          <td>${app.strengths || 'N/A'}</td>
+          <td>${app.weaknesses || 'N/A'}</td>
+          <td><button onclick="viewResultDetails('${jobId}', '${app.candidate_id}')">Result Details</button></td>
+        `;
+        tbody.appendChild(row);
+      });
+
+      table.style.display = '';
+    }
+
+    function showError(msg) {
+      const errDiv = document.getElementById('error');
+      errDiv.textContent = msg;
+      errDiv.style.display = '';
+      document.getElementById('applicant-table').style.display = 'none';
+    }
+
+    // Redirect to result details page with job_id and candidate_id
+    function viewResultDetails(jobId, candidateId) {
+      window.location.href = `userresultgrok.html?job_id=${jobId}&candidate_id=${candidateId}`;
+    }
+
+    // Make viewResultDetails globally accessible for inline onclick
+    window.viewResultDetails = viewResultDetails;
+
+    // Fetch applicants on page load
+    fetchApplicants();
+  </script>
+</body>
+</html>

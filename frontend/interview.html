@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nexthire Coding Interview</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 0; padding: 0; background-color: #e3f2fd; position: relative; overflow-x: hidden; }
+        .header { background-color: #1976d2; color: white; padding: 10px 20px; display: flex; justify-content: space-between; align-items: center; position: fixed; width: 100%; top: 0; z-index: 1000; }
+        .header .logo { font-size: 1.5em; font-weight: bold; }
+        .nav { display: flex; align-items: center; }
+        .nav a { color: white; margin-left: 20px; text-decoration: none; font-size: 1em; }
+        .nav a:hover { text-decoration: underline; }
+        .timer { font-size: 1.5em; font-weight: bold; color: white; position: absolute; left: 50%; transform: translateX(-50%); width: 80px; height: 80px; background-color: #1976d2; border-radius: 50%; display: flex; justify-content: center; align-items: center; }
+        .shape1 { position: absolute; width: 300px; height: 300px; background: rgba(25, 118, 210, 0.2); border-radius: 50%; top: 10%; left: 5%; z-index: -1; }
+        .shape2 { position: absolute; width: 400px; height: 400px; background: rgba(25, 118, 210, 0.1); border-radius: 50%; bottom: 10%; right: 5%; z-index: -1; }
+        .container { max-width: 1200px; margin: 80px auto 20px; padding: 20px; position: relative; }
+        .challenge { background-color: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); text-align: left; }
+        .editor-container { width: 100%; height: 400px; border: 1px solid #ddd; border-radius: 4px; margin-top: 10px; overflow: hidden; }
+        .submit-btn { background-color: #1976d2; color: white; padding: 10px 20px; border: none; border-radius: 4px; cursor: pointer; font-size: 1em; margin-top: 10px; }
+        .submit-btn:hover { background-color: #1565c0; }
+        .submit-btn:disabled { background-color: #bdbdbd; cursor: not-allowed; }
+        #challenge-desc pre, #challenge-desc code { background: #222; color: #f8f8f2; border-radius: 4px; padding: 8px; font-family: "Fira Mono", "Consolas", "Menlo", monospace; }
+        #challenge-desc pre { overflow-x: auto; }
+        #languageSelector { margin-top:10px; margin-bottom:10px; }
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+     <script>
+        if (!localStorage.getItem("user_id") || !localStorage.getItem("access_token")) {
+            window.location.href = "login.html";
+        }
+    </script>
+</head>
+<body>
+    <div class="header">
+        <div class="logo">Nexthire</div>
+        <div class="nav"><a href="#">Dashboard</a></div>
+        <div class="timer" id="timer">30:00</div>
+    </div>
+    <div class="shape1"></div>
+    <div class="shape2"></div>
+    <div class="container">
+        <div class="challenge">
+            <h2 id="challenge-title">Problem: Loading...</h2>
+            <div id="challenge-desc">Loading challenge...</div>
+            <select id="languageSelector">
+                <option value="javascript">JavaScript</option>
+                <option value="python">Python</option>
+                <option value="java">Java</option>
+                <option value="cpp">C++</option>
+                <option value="csharp">C#</option>
+                <option value="typescript">TypeScript</option>
+                <option value="go">Go</option>
+                <option value="php">PHP</option>
+                <option value="ruby">Ruby</option>
+                <option value="swift">Swift</option>
+            </select>
+            <div class="editor-container" id="editor"></div>
+            <button class="submit-btn" id="submitBtn">Submit Code</button>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.34.1/min/vs/loader.min.js"></script>
+    <script>
+        // --- Utility to get URL query params
+        function getQueryParam(param) {
+            const urlParams = new URLSearchParams(window.location.search);
+            return urlParams.get(param);
+        }
+
+        // --- Eligibility Check: Run Immediately on Page Load ---
+        (async function checkEligibility() {
+            const jobId = getQueryParam('jobId');
+            const candidateId = localStorage.getItem("user_id") || 0;
+            const token = localStorage.getItem("access_token") || "";
+
+            if (!jobId || !candidateId) {
+                alert("Missing job or candidate information.");
+                window.location.href = "beforeinterview.html";
+                return;
+            }
+            try {
+                const res = await fetch(`http://localhost:8000/user_apis/interview-eligibility?job_id=${jobId}&candidate_id=${candidateId}`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                if (!res.ok) {
+                    alert("You are not eligible for this interview.");
+                    window.location.href = "beforeinterview.html";
+                    return;
+                }
+                const data = await res.json();
+                const interviewDate = data.interview_date ? new Date(data.interview_date) : null;
+                const interviewGiven = data.interview_given === true;
+                const now = new Date();
+                if (!interviewDate || interviewDate < now || interviewGiven) {
+                    alert("Your interview period has expired or you have already given the interview.");
+                    window.location.href = "beforeinterview.html";
+                    return;
+                }
+            } catch (e) {
+                alert("Could not verify eligibility at this time.");
+                window.location.href = "beforeinterview.html";
+            }
+        })();
+
+        // --- Coding Challenge Fetch ---
+        const jobId = getQueryParam('jobId');
+        const candidateId = localStorage.getItem("user_id") || 0;
+        const token = localStorage.getItem("access_token") || "";
+        let challengeText = "";
+
+        async function fetchChallenge() {
+            if (!jobId) {
+                document.getElementById('challenge-title').textContent = "Problem: Invalid Job ID";
+                document.getElementById('challenge-desc').textContent = "No Job ID provided.";
+                document.getElementById('submitBtn').disabled = true;
+                return;
+            }
+            try {
+                const res = await fetch(`http://localhost:8000/user_apis/coding-challenge?job_id=${jobId}`, {
+                    headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' }
+                });
+                if (res.ok) {
+                    const data = await res.json();
+                    challengeText = data.coding_challenge || "";
+                    document.getElementById('challenge-title').textContent = "Problem";
+                    document.getElementById('challenge-desc').innerHTML = marked.parse(challengeText || "");
+                } else {
+                    document.getElementById('challenge-title').textContent = "Problem: Not Found";
+                    document.getElementById('challenge-desc').textContent = "Challenge not available for this Job ID.";
+                    document.getElementById('submitBtn').disabled = true;
+                }
+            } catch (err) {
+                document.getElementById('challenge-title').textContent = "Problem: Error";
+                document.getElementById('challenge-desc').textContent = "Could not fetch challenge.";
+                document.getElementById('submitBtn').disabled = true;
+            }
+        }
+
+        // --- Monaco Editor & Timer Logic ---
+        require.config({ paths: { 'vs': 'https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.34.1/min/vs' }});
+        require(['vs/editor/editor.main'], async function () {
+            await fetchChallenge();
+
+            const languageSelector = document.getElementById('languageSelector');
+            const templates = {
+                javascript: '// Write your code here\nfunction reverseString(s) {\n    \n}',
+                python: '# Write your code here\ndef reverse_string(s):\n    pass',
+                java: '// Write your code here\npublic class Solution {\n    public String reverseString(String s) {\n        return "";\n    }\n}',
+                cpp: '// Write your code here\n#include <string>\nstd::string reverseString(std::string s) {\n    return "";\n}',
+                csharp: '// Write your code here\npublic class Solution {\n    public string ReverseString(string s) {\n        return "";\n    }\n}',
+                typescript: '// Write your code here\nfunction reverseString(s: string): string {\n    return "";\n}',
+                go: '// Write your code here\nfunc reverseString(s string) string {\n    return ""\n}',
+                php: '<?php\n// Write your code here\nfunction reverseString($s) {\n    return "";\n}',
+                ruby: '# Write your code here\ndef reverse_string(s)\n    ""\nend',
+                swift: '// Write your code here\nfunc reverseString(_ s: String) -> String {\n    return ""\n}',
+            };
+
+            let currentLanguage = languageSelector.value;
+            let editor = monaco.editor.create(document.getElementById('editor'), {
+                value: templates[currentLanguage] || '',
+                language: currentLanguage,
+                theme: 'vs-dark',
+                automaticLayout: true
+            });
+
+            languageSelector.addEventListener('change', () => {
+                currentLanguage = languageSelector.value;
+                monaco.editor.setModelLanguage(editor.getModel(), currentLanguage);
+                editor.setValue(templates[currentLanguage] || '');
+            });
+
+            const timerDisplay = document.getElementById('timer');
+            const submitBtn = document.getElementById('submitBtn');
+            const TOTAL_TIME = 30 * 60; // 30 minutes in seconds
+            let timeLeft = TOTAL_TIME;
+            let timerInterval;
+            let hasSubmitted = false;
+
+            function getStateKey() {
+                return `codingChallengeState_${jobId || "unknown"}`;
+            }
+            function loadState() {
+                const savedState = localStorage.getItem(getStateKey());
+                if (savedState) {
+                    const { code, time, language } = JSON.parse(savedState);
+                    editor.setValue(code);
+                    if (language && language !== currentLanguage) {
+                        languageSelector.value = language;
+                        monaco.editor.setModelLanguage(editor.getModel(), language);
+                        currentLanguage = language;
+                    }
+                    timeLeft = Math.max(0, time);
+                    if (timeLeft === 0) submitCode(true);
+                }
+            }
+            function saveState() {
+                localStorage.setItem(getStateKey(), JSON.stringify({
+                    code: editor.getValue(),
+                    time: timeLeft,
+                    language: currentLanguage
+                }));
+            }
+            function formatTime(seconds) {
+                const minutes = Math.floor(seconds / 60);
+                const secs = seconds % 60;
+                return `${minutes.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+            }
+            function updateTimer() {
+                timerDisplay.textContent = formatTime(timeLeft);
+                if (timeLeft <= 0) {
+                    clearInterval(timerInterval);
+                    submitCode(true);
+                } else {
+                    timeLeft--;
+                    saveState();
+                }
+            }
+
+            async function updateInterviewStatus() {
+                // API call to update interview_given
+                try {
+                    const res = await fetch('http://localhost:8000/user_apis/update-interview-status', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${token}`
+                        },
+                        body: JSON.stringify({
+                            candidate_id: Number(candidateId),
+                            job_id: Number(jobId),
+                            interview_given: true
+                        })
+                    });
+                    // You may handle response if needed, here just best effort
+                } catch (e) {
+                    // Fallback: Ignore errors, maybe log if desired
+                }
+            }
+
+            async function submitCode(isAutoSubmit = false) {
+                if (hasSubmitted) return;
+                hasSubmitted = true;
+                if (timerInterval) clearInterval(timerInterval); // Stop timer
+                submitBtn.disabled = true;
+
+                const code = editor.getValue();
+                const language = languageSelector.value;
+                const data = {
+                    challenge: challengeText,
+                    answer: code,
+                    job_id: Number(jobId),
+                    candidate_id: Number(candidateId),
+                    language
+                };
+
+                try {
+                    const res = await fetch('http://localhost:8000/coding_scoring_bot/evaluate', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${token}`
+                        },
+                        body: JSON.stringify(data)
+                    });
+
+                    await updateInterviewStatus(); // Call regardless of scoring response
+
+                    if (res.ok) {
+                        alert(isAutoSubmit ? 'Time is up! Code submitted automatically.' : 'Code submitted successfully!');
+                        localStorage.removeItem(getStateKey());
+                        window.location.href = "userdashboard.html";
+                    } else {
+                        const err = await res.json().catch(() => ({}));
+                        alert("Submission failed: " + (err.message || res.statusText));
+                        window.location.href = "userdashboard.html";
+                    }
+                } catch (e) {
+                    await updateInterviewStatus(); // Call anyway
+                    alert('Submission failed due to network error.');
+                    window.location.href = "userdashboard.html";
+                }
+            }
+
+            function startTimer() {
+                loadState();
+                timerDisplay.textContent = formatTime(timeLeft);
+                timerInterval = setInterval(updateTimer, 1000);
+            }
+            submitBtn.addEventListener('click', () => submitCode());
+            editor.onDidChangeModelContent(() => saveState());
+            startTimer();
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pre-Interview</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f6f8;
+            color: #333;
+        }
+        .navbar {
+            background-color: #1976d2;
+            color: white;
+            padding: 10px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 1000;
+            box-sizing: border-box;
+        }
+        .navbar .logo {
+            font-size: 1.5em;
+            font-weight: bold;
+        }
+        .navbar .nav-links {
+            display: flex;
+            align-items: center;
+        }
+        .navbar .nav-links a {
+            color: white;
+            margin-left: 20px;
+            text-decoration: none;
+            font-size: 1em;
+            white-space: nowrap;
+        }
+        .navbar .nav-links a:hover {
+            text-decoration: underline;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 80px auto 20px;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: calc(100vh - 100px);
+        }
+        .card {
+            background-color: #fff;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            text-align: center;
+            width: 100%;
+            max-width: 400px;
+        }
+        .card h2 {
+            margin: 0 0 20px;
+            color: #1976d2;
+            font-size: 1.8em;
+        }
+        .card input {
+            width: 80%;
+            padding: 10px;
+            margin-bottom: 20px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 1em;
+        }
+        .card button {
+            background-color: #1976d2;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 1em;
+        }
+        .card button:hover {
+            background-color: #1565c0;
+        }
+        @media (max-width: 600px) {
+            .navbar .nav-links {
+                flex-direction: column;
+                position: absolute;
+                top: 60px;
+                right: 20px;
+                background-color: #1976d2;
+                padding: 10px;
+                display: none;
+            }
+            .navbar .nav-links.active {
+                display: flex;
+            }
+            .navbar .nav-links a {
+                margin: 10px 0;
+            }
+        }
+    </style>
+     <script>
+        if (!localStorage.getItem("user_id") || !localStorage.getItem("access_token")) {
+            window.location.href = "login.html";
+        }
+    </script>
+</head>
+<body>
+    <div class="navbar">
+        <div class="logo">Nexthire</div>
+        <div class="nav-links" id="navLinks">
+            <a href="userdashboard.html">Dashboard</a>
+        </div>
+    </div>
+    <div class="container">
+        <div class="card">
+            <h2>Start Interview</h2>
+            <h4>You can find the Job Id on the Dashboard</h4>
+            <input type="text" id="jobId" placeholder="Enter Job ID" required>
+            <button id="startInterviewBtn">Start Interview</button>
+        </div>
+    </div>
+
+    <script>
+        const startInterviewBtn = document.getElementById('startInterviewBtn');
+        const jobIdInput = document.getElementById('jobId');
+
+        startInterviewBtn.addEventListener('click', () => {
+            const jobId = jobIdInput.value.trim();
+            if (jobId) {
+                // Redirect to interview page with jobId as a query parameter
+                window.location.href = `interview.html?jobId=${encodeURIComponent(jobId)}`;
+            } else {
+                alert('Please enter a Job ID');
+            }
+        });
+    </script>
+</body>
+</html>

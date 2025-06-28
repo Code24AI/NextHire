@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Sign Up - NextHire</title>
+  <link rel="stylesheet" href="css/style.css" />
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #a8d0ff 0%, #ffffff 100%);
+    }
+
+    .navbar {
+      background: linear-gradient(90deg, #1e3a8a, #2563eb);
+      box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1rem 2rem;
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+    }
+
+    .navbar h1 {
+      color: white;
+      font-size: 1.8rem;
+      cursor: pointer;
+    }
+
+    .navbar ul {
+      list-style: none;
+      display: flex;
+      gap: 1.5rem;
+    }
+
+    .navbar ul li a {
+      text-decoration: none;
+      color: white;
+      font-weight: 600;
+      padding: 0.5rem 0.8rem;
+      border-radius: 6px;
+      transition: background-color 0.3s ease;
+    }
+
+    .navbar ul li a:hover {
+      background-color: rgba(255, 255, 255, 0.25);
+    }
+
+    .form-toggle {
+      display: flex;
+      justify-content: center;
+      margin-top: 30px;
+    }
+
+    .form-toggle button {
+      padding: 10px 20px;
+      margin: 0 10px;
+      border: none;
+      background-color: #007BFF;
+      color: white;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+    .form-toggle button.active {
+      background-color: #0056b3;
+    }
+
+    .signup-form {
+      background-color: white;
+      max-width: 500px;
+      margin: 30px auto;
+      padding: 30px;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      display: none;
+    }
+
+    .signup-form.active {
+      display: block;
+    }
+
+    .signup-form h3 {
+      margin-bottom: 20px;
+      color: #007BFF;
+      text-align: center;
+    }
+
+    .signup-form label {
+      display: block;
+      margin-bottom: 5px;
+      color: #333;
+    }
+
+    .signup-form input {
+      width: 100%;
+      padding: 10px;
+      margin-bottom: 15px;
+      border-radius: 5px;
+      border: 1px solid #ccc;
+    }
+
+    .signup-form button {
+      width: 100%;
+      padding: 10px;
+      background-color: #007BFF;
+      border: none;
+      color: white;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+    /* Loader Wrapper */
+    #loader-wrapper {
+      position: fixed;
+      width: 100%;
+      height: 100vh;
+      background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 9999;
+    }
+
+    .loader {
+      border: 8px solid #f3f3f3;
+      border-top: 8px solid #00c6ff;
+      border-radius: 50%;
+      width: 60px;
+      height: 60px;
+      animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    /* Footer */
+    .footer {
+      background-color: #f3f4f6;
+      padding: 2rem 1rem;
+      text-align: center;
+      color: #6b7280;
+      font-size: 0.9rem;
+      box-shadow: inset 0 1px 0 rgba(0,0,0,0.05);
+      margin-top: 3rem;
+    }
+
+    .footer a {
+      color: #3b82f6;
+      text-decoration: none;
+      font-weight: 600;
+      margin: 0 0.5rem;
+    }
+
+    .footer a:hover,
+    .footer a:focus {
+      text-decoration: underline;
+    }
+  </style>
+    <script>
+        if (localStorage.getItem("access_token")) {
+            window.location.href = "index.html";
+        }
+    </script>
+</head>
+<body>
+  <!-- Navbar -->
+  <nav class="navbar">
+    <h1>NextHire</h1>
+    <ul>
+      <li><a href="index.html">Home</a></li>
+      <li><a href="signup.html">Sign Up</a></li>
+      <li><a href="login.html">Login</a></li>
+    </ul>
+  </nav>
+
+  <!-- Toggle Buttons -->
+  <div class="form-toggle">
+    <button id="candidateBtn" class="active" onclick="toggleForm('candidate')">Candidate Signup</button>
+    <button id="hrBtn" onclick="toggleForm('hr')">HR Signup</button>
+  </div>
+
+  <!-- Candidate Signup Form -->
+  <form class="signup-form active" id="candidateForm">
+    <h3>Candidate Signup</h3>
+    <label for="cand-name">Full Name</label>
+    <input type="text" id="cand-name" placeholder="Enter your full name" required>
+
+    <label for="cand-email">Email</label>
+    <input type="email" id="cand-email" placeholder="Enter your email" required>
+
+    <label for="cand-phone">Phone</label>
+    <input type="tel" id="cand-phone" placeholder="Enter your phone number" required>
+
+    <label for="cand-password">Password</label>
+    <input type="password" id="cand-password" placeholder="Create a password" required>
+
+    <button type="submit">Sign Up as Candidate</button>
+  </form>
+
+  <!-- HR Signup Form -->
+  <form class="signup-form" id="hrForm">
+    <h3>HR Signup</h3>
+    <label for="hr-name">Full Name</label>
+    <input type="text" id="hr-name" placeholder="Enter your full name" required>
+
+    <label for="hr-email">Email</label>
+    <input type="email" id="hr-email" placeholder="Enter your email" required>
+
+    <label for="hr-phone">Phone</label>
+    <input type="tel" id="hr-phone" placeholder="Enter your phone number" required>
+
+    <label for="hr-password">Password</label>
+    <input type="password" id="hr-password" placeholder="Create a password" required>
+
+    <button type="submit">Sign Up as HR</button>
+  </form>
+
+  <!-- Loader -->
+  <div id="loader-wrapper">
+    <div class="loader"></div>
+  </div>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <p>© 2025 NextHire. All rights reserved.</p>
+    <p>
+      <a href="privacy.html">Privacy Policy</a> |
+      <a href="terms.html">Terms of Service</a> |
+      <a href="contact.html">Contact</a>
+    </p>
+  </footer>
+
+  <!-- JS -->
+  <script>
+    function toggleForm(type) {
+      const candidateForm = document.getElementById("candidateForm");
+      const hrForm = document.getElementById("hrForm");
+      const candidateBtn = document.getElementById("candidateBtn");
+      const hrBtn = document.getElementById("hrBtn");
+
+      if (type === "candidate") {
+        candidateForm.classList.add("active");
+        hrForm.classList.remove("active");
+        candidateBtn.classList.add("active");
+        hrBtn.classList.remove("active");
+      } else {
+        hrForm.classList.add("active");
+        candidateForm.classList.remove("active");
+        hrBtn.classList.add("active");
+        candidateBtn.classList.remove("active");
+      }
+    }
+
+    document.getElementById("candidateForm").addEventListener("submit", async function (e) {
+      e.preventDefault();
+      const name = document.getElementById("cand-name").value;
+      const email = document.getElementById("cand-email").value;
+      const phone = document.getElementById("cand-phone").value;
+      const password = document.getElementById("cand-password").value;
+
+      const res = await fetch("http://localhost:8000/auth/otp/request", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email }),
+      });
+
+      if (res.ok) {
+        localStorage.setItem("signup_role", "candidate");
+        localStorage.setItem("signup_data", JSON.stringify({ name, email, phone, password }));
+        window.location.href = "otp.html";
+      } else {
+        alert("Error: " + (await res.json()).detail);
+      }
+    });
+
+    document.getElementById("hrForm").addEventListener("submit", async function (e) {
+      e.preventDefault();
+      const name = document.getElementById("hr-name").value;
+      const email = document.getElementById("hr-email").value;
+      const phone = document.getElementById("hr-phone").value;
+      const password = document.getElementById("hr-password").value;
+
+      const res = await fetch("http://localhost:8000/auth/otp/request", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email }),
+      });
+
+      if (res.ok) {
+        localStorage.setItem("signup_role", "company");
+        localStorage.setItem("signup_data", JSON.stringify({ name, email, phone, password, address: "" }));
+        window.location.href = "otp.html";
+      } else {
+        alert("Error: " + (await res.json()).detail);
+      }
+    });
+
+    window.addEventListener("load", () => {
+      const loaderWrapper = document.getElementById("loader-wrapper");
+      loaderWrapper.style.opacity = '0';
+      setTimeout(() => {
+        loaderWrapper.style.display = 'none';
+      }, 500);
+    });
+  </script>
+</body>
+</html>

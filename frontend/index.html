@@ -1,0 +1,735 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>NextHire - Home</title>
+  <style>
+    :root {
+      --primary-color: #3b82f6;
+      --primary-color-dark: #2563eb;
+      --secondary-color: #6b7280;
+      --background-color: #f8f9fa;
+      --text-color: #1a1a1a;
+      --shadow: 0 2px 8px rgba(0,0,0,0.1);
+      --border-radius: 15px;
+      --font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: var(--font-family);
+      background-color: var(--background-color);
+      color: var(--text-color);
+      line-height: 1.6;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    .navbar {
+      background: linear-gradient(90deg, #1e3a8a, #2563eb);
+      box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1rem 2rem;
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+      font-weight: 600;
+      font-family: var(--font-family);
+    }
+
+    .navbar h1 {
+      color: white;
+      font-size: 1.8rem;
+      cursor: pointer;
+      user-select: none;
+      letter-spacing: 1px;
+      font-weight: 700;
+    }
+
+    .navbar ul {
+      list-style: none;
+      display: flex;
+      gap: 1.5rem;
+      margin: 0;
+    }
+
+    .navbar ul li a, .navbar ul li span {
+      text-decoration: none;
+      color: white;
+      font-weight: 600;
+      padding: 0.5rem 0.8rem;
+      border-radius: 6px;
+      transition: background-color 0.3s ease, color 0.3s ease;
+      cursor: pointer;
+      background: none;
+      border: none;
+    }
+
+    .navbar ul li a:hover,
+    .navbar ul li a:focus {
+      background-color: rgba(255, 255, 255, 0.25);
+      outline: none;
+    }
+
+    .hero {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      height: 80vh;
+      background: linear-gradient(135deg, #a8d0ff 0%, #ffffff 100%);
+      color: var(--text-color);
+      text-align: center;
+      padding: 0 1rem;
+      overflow: hidden;
+      font-weight: 600;
+    }
+
+    .hero::before,
+    .hero::after {
+      content: "";
+      position: absolute;
+      border-radius: 50%;
+      opacity: 0.15;
+      z-index: 0;
+    }
+
+    .hero::before {
+      width: 300px;
+      height: 300px;
+      background: #60a5fa;
+      top: -100px;
+      left: -100px;
+    }
+
+    .hero::after {
+      width: 400px;
+      height: 400px;
+      background: #93c5fd;
+      bottom: -150px;
+      right: -150px;
+    }
+
+    .hero h1, 
+    .hero p, 
+    .hero .hero-buttons {
+      position: relative;
+      z-index: 1;
+      max-width: 900px;
+    }
+
+    .hero h1 {
+      font-size: 3rem;
+      margin-bottom: 1rem;
+      line-height: 1.2;
+    }
+
+    .hero p {
+      font-size: 1.25rem;
+      margin-bottom: 2rem;
+      opacity: 0.8;
+    }
+
+    .hero-buttons {
+      display: flex;
+      gap: 1rem;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    .btn-primary {
+      background-color: var(--primary-color);
+      color: white;
+      font-weight: 700;
+      padding: 15px 30px;
+      border-radius: 50px;
+      border: none;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+      box-shadow: 0 8px 15px rgba(59,130,246,0.3);
+      font-size: 1.1rem;
+    }
+
+    .job-company,
+    .job-location,
+    .job-experience,
+    .job-salary {
+      font-size: 0.95rem;
+      color: #171616;
+      margin-bottom: 0.3rem;
+    }
+
+    .btn-primary:hover {
+      background-color: var(--primary-color-dark);
+    }
+
+    .btn-secondary {
+      background-color: transparent;
+      border: 2px solid var(--primary-color);
+      color: var(--primary-color);
+      font-weight: 700;
+      padding: 15px 30px;
+      border-radius: 50px;
+      cursor: pointer;
+      font-size: 1.1rem;
+      transition: background-color 0.3s ease, color 0.3s ease;
+    }
+
+    .btn-secondary:hover {
+      background-color: var(--primary-color);
+      color: white;
+    }
+
+    .job-posts {
+      max-width: 1100px;
+      margin: 3rem auto 5rem;
+      padding: 0 1rem;
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 1.5rem;
+    }
+
+    .job-card {
+      background-color: white;
+      padding: 1.5rem;
+      border-radius: var(--border-radius);
+      box-shadow: 0 6px 18px rgba(0, 0, 0, 0.1);
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    .job-card:hover {
+      transform: translateY(-8px);
+      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.15);
+    }
+
+    .job-title {
+      font-size: 1.3rem;
+      font-weight: 700;
+      color: var(--primary-color);
+      margin-bottom: 0.75rem;
+    }
+
+    .job-description {
+      font-size: 1rem;
+      color: #444;
+      flex-grow: 1;
+      margin-bottom: 1rem;
+    }
+
+    .job-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.9rem;
+      color: #666;
+    }
+
+    .job-footer span {
+      font-weight: 600;
+    }
+
+    .footer {
+      background-color: #f3f4f6;
+      padding: 2rem 1rem;
+      text-align: center;
+      color: var(--secondary-color);
+      font-size: 0.9rem;
+      box-shadow: inset 0 1px 0 rgba(0,0,0,0.05);
+      margin-top: auto;
+    }
+
+    .footer a {
+      color: var(--primary-color);
+      text-decoration: none;
+      font-weight: 600;
+      margin: 0 0.5rem;
+    }
+
+    .footer a:hover,
+    .footer a:focus {
+      text-decoration: underline;
+    }
+
+    #chatbot-widget {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      width: 360px;
+      max-width: 95vw;
+      background: #fff;
+      border-radius: 16px;
+      box-shadow: 0 2px 16px rgba(0,0,0,0.12);
+      font-family: 'Segoe UI', Arial, sans-serif;
+      z-index: 9999;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      height: 500px;
+      border: 1px solid #e0e0e0;
+      box-sizing: border-box;
+    }
+
+    #chatbot-header {
+      background: #264aff;
+      color: #fff;
+      padding: 16px;
+      text-align: left;
+      font-weight: 600;
+      letter-spacing: 0.03em;
+      font-size: 1.15rem;
+    }
+
+    #chatbot-messages {
+      flex: 1 1 auto;
+      padding: 16px;
+      overflow-y: auto;
+      background: #f7f8fa;
+      font-size: 1rem;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    #chatbot-form {
+      display: flex;
+      border-top: 1px solid #e0e0e0;
+      background: #fff;
+      padding: 8px;
+      gap: 8px;
+    }
+
+    #chatbot-input {
+      flex: 1 1 auto;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      padding: 10px;
+      font-size: 1rem;
+      outline: none;
+      transition: border-color 0.2s;
+      word-spacing: 0.1em;
+      letter-spacing: 0.01em;
+    }
+
+    #chatbot-input:focus {
+      border-color: #264aff;
+    }
+
+    #chatbot-send {
+      background: #264aff;
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      padding: 10px 18px;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    #chatbot-send:disabled {
+      background: #aaa;
+      cursor: not-allowed;
+    }
+
+    .chatbot-message {
+      word-break: break-word;
+      white-space: pre-line;
+      overflow-wrap: anywhere;
+      box-sizing: border-box;
+      line-height: 1.5;
+      word-spacing: 0.12em;
+      letter-spacing: 0.02em;
+      margin: 0;
+      padding: 0;
+    }
+
+    .chatbot-message.user {
+      align-self: flex-end;
+      background: #e8f0fe;
+      color: #222;
+      border-radius: 16px 16px 2px 16px;
+      padding: 8px 12px;
+      max-width: 80%;
+    }
+
+    .chatbot-message.bot {
+      align-self: flex-start;
+      background: #fff;
+      color: #111;
+      border-radius: 16px 16px 16px 2px;
+      padding: 8px 12px;
+      max-width: 80%;
+      box-shadow: 0 1px 4px rgba(38,74,255,0.06);
+      animation: fadeIn 0.45s cubic-bezier(.39,.575,.565,1.000);
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    #chatbot-toggle {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      background: #264aff;
+      color: #fff;
+      border: none;
+      border-radius: 50%;
+      width: 56px;
+      height: 56px;
+      font-size: 1.5rem;
+      cursor: pointer;
+      z-index: 9999;
+      box-shadow: 0 2px 10px rgba(38,74,255,0.25);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    @media (max-width: 480px) {
+      #chatbot-widget {
+        width: 98vw;
+        right: 1vw;
+        bottom: 1vw;
+        height: 65vh;
+      }
+      #chatbot-toggle {
+        right: 2vw;
+        bottom: 2vw;
+      }
+    }
+
+    @media (max-width: 600px) {
+      .hero h1 {
+        font-size: 2.2rem;
+      }
+
+      .hero p {
+        font-size: 1rem;
+      }
+
+      .job-posts {
+        grid-template-columns: 1fr;
+      }
+
+      .navbar ul {
+        gap: 1rem;
+      }
+
+      .navbar h1 {
+        font-size: 1.4rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Navbar -->
+  <nav class="navbar">
+    <h1 onclick="console.log('Navbar logo clicked'); window.location.href='index.html'">NextHire</h1>
+    <ul id="nav-menu"></ul>
+  </nav>
+
+  <!-- Hero Section -->
+  <section class="hero">
+    <h1>Find the best talent or your dream job with NextHire</h1>
+    <p>Connecting HR professionals with the right candidates seamlessly through AI-powered recruitment.</p>
+    <div class="hero-buttons">
+      <button class="btn-primary" onclick="console.log('Get Started clicked'); window.location.href='signup.html'">Get Started</button>
+      <button class="btn-secondary" onclick="console.log('Login clicked'); window.location.href='login.html'">Login</button>
+    </div>
+  </section>
+
+  <!-- Job Posts -->
+  <section class="job-posts" id="job-posts">
+    <!-- Dynamic job cards will be inserted here -->
+  </section>
+
+  <!-- Chatbot Widget -->
+  <div id="chatbot-toggle" title="Chat with us!">💬</div>
+  <div id="chatbot-widget" style="display:none;">
+    <div id="chatbot-header">
+      🤖 NextHire Q&A Bot
+      <span style="float:right;cursor:pointer;" id="chatbot-close-btn" title="Close">×</span>
+    </div>
+    <div id="chatbot-messages"></div>
+    <form id="chatbot-form" action="javascript:void(0);">
+      <input type="text" id="chatbot-input" placeholder="Ask your question..." autocomplete="off" required />
+      <button id="chatbot-send" type="submit">Send</button>
+    </form>
+  </div>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <p>© 2025 NextHire. All rights reserved.</p>
+    <p>
+      <a href="privacy.html" onclick="console.log('Privacy Policy clicked')">Privacy Policy</a> | 
+      <a href="terms.html" onclick="console.log('Terms of Service clicked')">Terms of Service</a> | 
+      <a href="contact.html" onclick="console.log('Contact clicked')">Contact</a>
+    </p>
+  </footer>
+
+  <script>
+    // Global click handler to debug navigations
+    document.addEventListener('click', (e) => {
+      console.log('Global click on element:', e.target.tagName, 'id:', e.target.id, 'class:', e.target.className);
+    });
+
+    // Navbar dynamic rendering
+    function renderNavbar() {
+      const nav = document.getElementById('nav-menu');
+      nav.innerHTML = '';
+      
+      if (localStorage.getItem('user_name') && localStorage.getItem('role') === "candidate") {
+        nav.innerHTML = `
+          <li><a href="userdashboard.html" onclick="console.log('User dashboard link clicked')">Hello, ${localStorage.getItem('user_name')} (${localStorage.getItem('role')})</a></li>
+          <li><a href="#" id="logout-link">Logout</a></li>
+        `;
+        document.getElementById('logout-link').addEventListener('click', function(e) {
+          e.preventDefault();
+          e.stopPropagation();
+          console.log('Logout clicked');
+          localStorage.clear();
+          window.location.href = 'index.html';
+        });
+      } else if (localStorage.getItem('user_name') && localStorage.getItem('role') === "HR") {
+        nav.innerHTML = `
+          <li><a href="hr_dashboard.html" onclick="console.log('HR dashboard link clicked')">Hello, ${localStorage.getItem('user_name')} (${localStorage.getItem('role')})</a></li>
+          <li><a href="#" id="logout-link">Logout</a></li>
+        `;
+        document.getElementById('logout-link').addEventListener('click', function(e) {
+          e.preventDefault();
+          e.stopPropagation();
+          console.log('Logout clicked');
+          localStorage.clear();
+          window.location.href = 'index.html';
+        });
+      } else {
+        nav.innerHTML = `
+          <li><a href="index.html" onclick="console.log('Home link clicked')">Home</a></li>
+          <li><a href="signup.html" onclick="console.log('Sign Up link clicked')">Sign Up</a></li>
+          <li><a href="login.html" onclick="console.log('Login link clicked')">Login</a></li>
+        `;
+      }
+    }
+    renderNavbar();
+
+    // Job fetch and card logic
+    async function fetchJobs() {
+      try {
+        console.log('Fetching jobs');
+        const res = await fetch('http://localhost:8000/auth/job-posts2');
+        if (!res.ok) throw new Error('Failed to fetch jobs');
+        const jobs = await res.json();
+
+        const container = document.getElementById('job-posts');
+        container.innerHTML = '';
+
+        jobs.forEach(job => {
+          const jobCard = document.createElement('div');
+          jobCard.className = 'job-card';
+          jobCard.addEventListener('click', (e) => {
+            e.stopPropagation();
+            console.log('Job card clicked, id:', job.id);
+            if (!localStorage.getItem('role')) {
+              alert("Please login as a candidate to view job details.");
+              console.log('Navigating to login.html due to no role');
+              window.location.href = "login.html";
+              return;
+            }
+            if (localStorage.getItem('role') !== "candidate") {
+              alert("Only candidates can access job details.");
+              console.log('Navigating to index.html due to non-candidate role');
+              window.location.href = "index.html";
+              return;
+            }
+            console.log('Navigating to jobdetails.html, id:', job.id);
+            window.location.href = `jobdetails.html?id=${job.id}`;
+          });
+
+          jobCard.innerHTML = `
+            <div class="job-title">${job.title}</div>
+            <div class="job-company">Company: ${job.company || 'Unknown Company'}</div>
+            <div class="job-location">Location: ${job.location || 'Location not specified'}</div>
+            <div class="job-experience">Experience: ${job.experience_level || 'Not specified'}</div>
+            <div class="job-salary">Salary: ${job.salary_range || 'Salary not disclosed'}</div>
+            <div class="job-footer">
+              <span>Deadline: ${job.deadline ? new Date(job.deadline).toLocaleDateString() : 'N/A'}</span>
+            </div>
+          `;
+
+          container.appendChild(jobCard);
+        });
+      } catch (error) {
+        console.error('Fetch jobs error:', error);
+        document.getElementById('job-posts').innerHTML = `<p>Failed to load jobs. Please try again later.</p>`;
+      }
+    }
+    fetchJobs();
+
+    // Persistent session_id for conversation memory
+    let chatbotSessionId = localStorage.getItem('chatbotSessionId');
+    if (!chatbotSessionId) {
+      chatbotSessionId = self.crypto.randomUUID ? self.crypto.randomUUID() : Math.random().toString(36).substring(2, 15);
+      localStorage.setItem('chatbotSessionId', chatbotSessionId);
+    }
+
+    // Toggle chatbot open/close
+    function toggleChatbot(event) {
+      if (event) event.stopPropagation();
+      const widget = document.getElementById('chatbot-widget');
+      const toggle = document.getElementById('chatbot-toggle');
+      console.log('toggleChatbot called, widget display:', widget.style.display);
+      if (widget.style.display === 'none' || !widget.style.display) {
+        widget.style.display = 'flex';
+        toggle.style.display = 'none';
+        localStorage.setItem('chatbotOpen', 'true');
+      } else {
+        widget.style.display = 'none';
+        toggle.style.display = 'flex';
+        localStorage.setItem('chatbotOpen', 'false');
+      }
+    }
+
+    // Initialize chatbot visibility on page load
+    document.addEventListener('DOMContentLoaded', () => {
+      const isOpen = localStorage.getItem('chatbotOpen') === 'true';
+      const widget = document.getElementById('chatbot-widget');
+      const toggle = document.getElementById('chatbot-toggle');
+      widget.style.display = isOpen ? 'flex' : 'none';
+      toggle.style.display = isOpen ? 'none' : 'flex';
+      console.log('Page loaded, chatbot widget display:', widget.style.display);
+    });
+
+    // Detect page reloads or navigations
+    window.onbeforeunload = function() {
+      console.log('Page is about to reload or navigate');
+      return null;
+    };
+
+    // Attach open/close events
+    document.getElementById('chatbot-toggle').addEventListener('click', (e) => {
+      e.stopPropagation();
+      console.log('Chatbot toggle clicked');
+      toggleChatbot(e);
+    });
+    document.getElementById('chatbot-close-btn').addEventListener('click', (e) => {
+      e.stopPropagation();
+      console.log('Chatbot close button clicked');
+      toggleChatbot(e);
+    });
+
+    // Append message with robust handling
+    function appendMessage(text, sender = 'bot', animated = false) {
+      const messages = document.getElementById('chatbot-messages');
+      if (!messages) {
+        console.error('chatbot-messages div not found');
+        return;
+      }
+      const msgDiv = document.createElement('div');
+      msgDiv.className = 'chatbot-message ' + sender;
+      
+      // Ensure text is a string and escape HTML
+      const safeText = String(text).replace(/&/g, '&').replace(/</g, '<').replace(/>/g, '>').replace(/\n/g, '<br>');
+      
+      if (animated && sender === 'bot') {
+        const PLACEHOLDER = '[[[BR]]]';
+        const animText = safeText.replace(/<br>/g, PLACEHOLDER);
+        let i = 0;
+        let out = '';
+        
+        messages.appendChild(msgDiv);
+        messages.scrollTop = messages.scrollHeight;
+
+        function typeWriter() {
+          if (i < animText.length) {
+            if (animText.substr(i, PLACEHOLDER.length) === PLACEHOLDER) {
+              out += '<br>';
+              i += PLACEHOLDER.length;
+            } else {
+              out += animText[i];
+              i++;
+            }
+            msgDiv.innerHTML = out;
+            messages.scrollTop = messages.scrollHeight;
+            setTimeout(typeWriter, 13 + Math.random() * 16);
+          }
+        }
+        typeWriter();
+      } else {
+        msgDiv.innerHTML = safeText;
+        messages.appendChild(msgDiv);
+        messages.scrollTop = messages.scrollHeight;
+      }
+      console.log('Appended message, widget display:', document.getElementById('chatbot-widget').style.display);
+    }
+
+    // Handle form submission
+    document.getElementById('chatbot-form').addEventListener('submit', function(event) {
+      event.preventDefault();
+      event.stopPropagation();
+      console.log('Form submitted, preventing default');
+      const input = document.getElementById('chatbot-input');
+      const question = input.value.trim();
+      if (!question) {
+        console.log('Empty input, ignoring submission');
+        return false;
+      }
+      
+      appendMessage(question, 'user');
+      input.value = '';
+      document.getElementById('chatbot-send').disabled = true;
+      appendMessage('Thinking...', 'bot');
+
+      fetch('http://localhost:8000/service_bot/ask', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({
+          session_id: chatbotSessionId,
+          question: question
+        })
+      })
+      .then(resp => {
+        console.log('Chatbot response status:', resp.status);
+        if (!resp.ok) throw new Error(`HTTP error! status: ${resp.status}`);
+        return resp.json();
+      })
+      .then(data => {
+        console.log('Chatbot response data:', data);
+        const messages = document.getElementById('chatbot-messages');
+        if (messages.lastChild && messages.lastChild.innerText === 'Thinking...') {
+          messages.removeChild(messages.lastChild);
+        }
+        appendMessage(data.answer || "Sorry, I couldn't understand that.", 'bot', false); // Disable animation
+      })
+      .catch(err => {
+        console.error('Chatbot fetch error:', err);
+        const messages = document.getElementById('chatbot-messages');
+        if (messages.lastChild && messages.lastChild.innerText === 'Thinking...') {
+          messages.removeChild(messages.lastChild);
+        }
+        appendMessage("Error: Could not connect to server.", 'bot');
+      })
+      .finally(() => {
+        document.getElementById('chatbot-send').disabled = false;
+        console.log('After fetch, widget display:', document.getElementById('chatbot-widget').style.display);
+      });
+      return false;
+    });
+  </script>
+</body>
+</html>

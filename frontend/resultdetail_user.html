@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Result Details</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #e3f2fd;
+            color: #333;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+        }
+        /* Navbar */
+        .navbar {
+            background-color: #1976d2;
+            color: white;
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 1000;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            box-sizing: border-box;
+        }
+        .navbar .logo {
+            font-size: 1.8em;
+            font-weight: bold;
+            flex-shrink: 0;
+        }
+        .navbar .nav-links {
+            display: flex;
+            align-items: center;
+        }
+        .navbar .nav-links a {
+            color: white;
+            margin-left: 20px;
+            text-decoration: none;
+            font-size: 1.1em;
+            white-space: nowrap;
+            transition: color 0.3s;
+        }
+        .navbar .nav-links a:hover {
+            color: #bbdefb;
+        }
+        .navbar .menu-toggle {
+            display: none;
+            font-size: 1.5em;
+            cursor: pointer;
+            padding: 5px;
+        }
+        /* Main Content */
+        .container {
+            max-width: 1000px;
+            margin: 100px auto 20px;
+            padding: 20px;
+        }
+        /* Title */
+        .title {
+            font-size: 2.2em;
+            color: #1976d2;
+            text-align: center;
+            margin-bottom: 30px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        /* Card */
+        .card {
+            background-color: #fff;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            border-left: 5px solid #1976d2;
+            width: 100%;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        .card h2 {
+            margin: 0 0 25px;
+            color: #1976d2;
+            font-size: 1.6em;
+            font-weight: 600;
+            border-bottom: 2px solid #e0f7fa;
+            padding-bottom: 10px;
+            text-align: center;
+        }
+        .card .result-item {
+            margin-bottom: 20px;
+            padding: 15px;
+            background-color: #f9f9f9;
+            border-radius: 5px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: background-color 0.3s;
+        }
+        .card .result-item:hover {
+            background-color: #eef6ff;
+        }
+        .card .result-item label {
+            font-weight: 500;
+            color: #555;
+            flex: 1;
+        }
+        .card .result-item span {
+            color: #2c3e50;
+            font-weight: 400;
+            flex: 1;
+            text-align: right;
+        }
+        /* Error Message */
+        .error-message {
+            color: #d32f2f;
+            text-align: center;
+            margin-top: 20px;
+            font-weight: 500;
+            font-size: 1.2em;
+            padding: 15px;
+            background-color: #ffebee;
+            border-radius: 5px;
+        }
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .navbar .nav-links {
+                display: none;
+                flex-direction: column;
+                position: absolute;
+                top: 60px;
+                right: 20px;
+                background-color: #1976d2;
+                padding: 15px;
+                border-radius: 5px;
+                box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            }
+            .navbar .nav-links.active {
+                display: flex;
+            }
+            .navbar .nav-links a {
+                margin: 10px 0;
+            }
+            .navbar .menu-toggle {
+                display: block;
+            }
+            .card {
+                padding: 20px;
+                max-width: 90%;
+            }
+            .title {
+                font-size: 1.8em;
+            }
+        }
+    </style>
+     <script>
+        if (!localStorage.getItem("user_id") || !localStorage.getItem("access_token")) {
+            window.location.href = "login.html";
+        }
+    </script>
+</head>
+<body>
+    <div class="navbar">
+        <div class="logo">Nexthire</div>
+        <div class="nav-links" id="navLinks">
+            <a href="userdashboard.html">Dashboard</a>
+        </div>
+        <div class="menu-toggle" id="menuToggle">☰</div>
+    </div>
+    <div class="container">
+        <div class="card">
+            <h2 class="title">Result Details</h2>
+            <div id="resultContent">
+                <div class="result-item"><label>Correctness Score:</label><span id="correctnessScore">0</span></div>
+                <div class="result-item"><label>Efficiency Score:</label><span id="efficiencyScore">0</span></div>
+                <div class="result-item"><label>Readability Score:</label><span id="readabilityScore">0</span></div>
+                <div class="result-item"><label>Edge Case Handling Score:</label><span id="edgeCaseHandlingScore">0</span></div>
+                <div class="result-item"><label>Overall Score:</span><span id="overallScore">0</span></div>
+                <div class="result-item"><label>Strengths:</label><span id="strengths">Loading...</span></div>
+                <div class="result-item"><label>Weaknesses:</label><span id="weaknesses">Loading...</span></div>
+            </div>
+            <div id="errorMessage" class="error-message" style="display: none;"></div>
+        </div>
+    </div>
+
+    <script>
+        // Function to get query parameters from URL
+        function getQueryParams() {
+            const params = new URLSearchParams(window.location.search);
+            return {
+                candidate_id: params.get('user_id'),
+                job_id: params.get('job_id')
+            };
+        }
+
+        // Function to fetch result data from backend
+        async function fetchResultData(candidate_id, job_id) {
+            const token = localStorage.getItem('access_token');
+            const apiUrl = 'http://127.0.0.1:8000/user_apis/qa-score';
+
+            if (!token) {
+                throw new Error('No authentication token found. Please log in again.');
+            }
+
+            try {
+                const response = await fetch(`${apiUrl}?candidate_id=${candidate_id}&job_id=${job_id}`, {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                if (!response.ok) {
+                    if (response.status === 401) {
+                        throw new Error('Unauthorized: Invalid or expired token. Please log in again.');
+                    } else if (response.status === 404) {
+                        throw new Error('Result is not published or the interview has not been given yet.');
+                    }
+                    throw new Error(`Failed to fetch result data: ${response.statusText}`);
+                }
+
+                const resultData = await response.json();
+                return resultData;
+            } catch (error) {
+                console.error('Error fetching result data:', error);
+                throw error;
+            }
+        }
+
+        // Function to update the page with result data
+        function updatePageWithData(data) {
+            if (!data) return;
+
+            document.getElementById('correctnessScore').textContent = data.correctness_score || 0;
+            document.getElementById('efficiencyScore').textContent = data.efficiency_score || 0;
+            document.getElementById('readabilityScore').textContent = data.readability_score || 0;
+            document.getElementById('edgeCaseHandlingScore').textContent = data.edge_case_handling_score || 0;
+            document.getElementById('overallScore').textContent = data.overall_score || 0;
+            document.getElementById('strengths').textContent = data.strengths || 'N/A';
+            document.getElementById('weaknesses').textContent = data.weaknesses || 'N/A';
+            document.getElementById('resultContent').style.display = 'block';
+            document.getElementById('errorMessage').style.display = 'none';
+        }
+
+        // Function to display error message
+        function displayError(message) {
+            const errorMessageElement = document.getElementById('errorMessage');
+            const resultContent = document.getElementById('resultContent');
+            errorMessageElement.textContent = message;
+            errorMessageElement.style.display = 'block';
+            resultContent.style.display = 'none';
+        }
+
+        // Main function to initialize the page
+        async function init() {
+            const { candidate_id, job_id } = getQueryParams();
+            if (!candidate_id || !job_id) {
+                displayError('Missing candidate_id or job_id in URL');
+                console.error('Missing candidate_id or job_id in URL');
+                return;
+            }
+
+            try {
+                const resultData = await fetchResultData(candidate_id, job_id);
+                updatePageWithData(resultData);
+            } catch (error) {
+                displayError(error.message);
+            }
+        }
+
+        // Toggle mobile menu
+        const navLinks = document.getElementById('navLinks');
+        const menuToggle = document.getElementById('menuToggle');
+        menuToggle.addEventListener('click', () => {
+            navLinks.classList.toggle('active');
+        });
+
+        // Initialize the page
+        init();
+    </script>
+</body>
+</html>
