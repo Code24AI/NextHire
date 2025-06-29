@@ -13,7 +13,7 @@ NextHire is an advanced interviewing platform designed to streamline job applica
   - Review, modify, and approve AI-generated job posts before publishing.
   - Automatically publish approved job listings on the platform.
 - **Dashboard Features**:
-  - View analytics: total job postings, applications received, and detailed applicant lists by job.
+  - View analytics: total job postings, applications , and detailed applicant lists by job.
   - Access candidate evaluation metrics, including scores, strengths, and weaknesses.
   - View shortlisted applicants and AI-generated recommendations for top candidates.
 
@@ -48,28 +48,27 @@ NextHire incorporates specialized AI bots and assistants:
 - **Customer Support Chatbot**: Provides 24/7 assistance for visitor inquiries.
 
 ## Project Structure
-- **backend/**: Contains the backend code, built with Python (likely using FastAPI for the API, given Uvicorn usage).
+- **backend/**: Contains the backend code, built with Python ( using FastAPI for the API, given Uvicorn usage).
 - **frontend/**: Contains the frontend code, built with HTML, CSS, and JavaScript.
 - **requirements.txt**: Lists Python dependencies for the backend.
-- **.env**: Stores environment variables for configuration (e.g., API keys, database URLs).
+- **.env**: Stores environment variables for configuration (e.g., API keys).
 
 ## Setup Instructions
 
 ### Prerequisites
 - **Conda**: Install Miniconda or Anaconda to manage the Python environment.
-- **Node.js**: Optional for frontend development (if using tools like live-server).
 - **Git**: To clone the repository.
 
 ### 1. Clone the Repository
 ```bash
-git clone https://github.com/your-username/nexthire.git
+git clone https://github.com/Code24AI/NextHire.git
 cd nexthire
 ```
 
 ### 2. Set Up the Conda Environment
 Create and activate a Conda environment for the backend:
 ```bash
-conda create -n nexthire python=3.9
+conda create -n nexthire python=3.10
 conda activate nexthire
 ```
 
@@ -86,7 +85,7 @@ touch backend/.env
 ```
 Add necessary configurations to `backend/.env`, such as:
 ```
-DATABASE_URL=your_database_url
+
 API_KEY=your_api_key
 ```
 
@@ -94,45 +93,25 @@ API_KEY=your_api_key
 Navigate to the backend directory and start the FastAPI server using Uvicorn:
 ```bash
 cd backend
-uvicorn main:app --host 0.0.0.0 --port 8000 --reload
+uvicorn main:app --reload
 ```
 - The backend API will be available at `http://localhost:8000`.
 - The `--reload` flag enables auto-reload for development.
 
 ### 6. Run the Frontend
-The frontend is built with HTML, CSS, and JavaScript and can be served using a simple HTTP server. You can use `live-server` (a Node.js package) or any static file server.
-
-#### Install live-server (Optional)
-```bash
-npm install -g live-server
-```
+The frontend is built with HTML, CSS, and JavaScript and can be served using a simple HTTP server. You can use `live-server` .
 
 #### Serve the Frontend
-Navigate to the frontend directory and start the server:
-```bash
-cd frontend
-live-server --port=8080
-```
-- The frontend will be available at `http://localhost:8080`.
-- Alternatively, open `frontend/index.html` directly in a browser for static testing (some features requiring API calls may not work without the backend).
+open the frontend folder in vscode and click the index.html inside the frontend folder then click on Go Live (if you donot install Live server Extension on your vscode please install first then only you can see the Go Live bottom of the vscode )
+
 
 ### 7. Access the Application
 - **Backend API**: `http://localhost:8000` (e.g., for API documentation if using FastAPI).
-- **Frontend**: `http://localhost:8080` (or the port specified for `live-server`).
-- Ensure the backend is running before accessing the frontend, as it may rely on API calls.
+- **Frontend**: open the frontend folder in vscode and click the index.html inside the frontend folder then click on Go Live (if you donot install Live server Extension on your vscode please install first then only you can see the Go Live bottom of the vscode )
+- Ensure the backend is running before accessing the frontend, as it  rely on API calls.
 
 ## Development Notes
-- **Backend**: Located in the `backend/` folder, likely using FastAPI. Ensure all endpoints are tested and environment variables are correctly set in `.env`.
+- **Backend**: Located in the `backend/` folder,  using FastAPI. Ensure all endpoints are tested and environment variables are correctly set in `.env`.
 - **Frontend**: Located in the `frontend/` folder, built with vanilla HTML, CSS, and JavaScript. Ensure API endpoints are correctly configured to communicate with the backend.
 - **AI Integration**: Ensure AI services (e.g., job creation, candidate scoring) are properly configured with API keys or service endpoints in the `.env` file.
 
-## Contributing
-Contributions are welcome! Please follow these steps:
-1. Fork the repository.
-2. Create a feature branch (`git checkout -b feature/your-feature`).
-3. Commit your changes (`git commit -m "Add your feature"`).
-4. Push to the branch (`git push origin feature/your-feature`).
-5. Open a pull request.
-
-## License
-This project is licensed under the MIT License. See the `LICENSE` file for details.
