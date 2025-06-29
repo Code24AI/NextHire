@@ -57,6 +57,7 @@ NextHire incorporates specialized AI bots and assistants:
 
 ### Prerequisites
 - **Conda**: Install Miniconda or Anaconda to manage the Python environment.
+- **PostgreSQL**: Install PostgreSQL (version 13 or higher recommended) for the database.
 - **Git**: To clone the repository.
 
 ### 1. Clone the Repository
@@ -88,8 +89,22 @@ Add necessary configurations to `backend/.env`, such as:
 
 API_KEY=your_api_key
 ```
+### 5. Install PostgreSQL
+Install PostgreSQL on your system:
+- **Windows**: Download and install from the [official PostgreSQL website](https://www.postgresql.org/download/windows/).
 
-### 5. Run the Backend
+Start the PostgreSQL service:
+
+- **Windows**: Use the Services app or `pg_ctl` to start the PostgreSQL server.
+
+Create a database for NextHire:
+```bash
+
+CREATE DATABASE nexthire;
+
+```
+
+### 6. Run the Backend
 Navigate to the backend directory and start the FastAPI server using Uvicorn:
 ```bash
 cd backend
@@ -98,8 +113,9 @@ uvicorn main:app --reload
 - The backend API will be available at `http://localhost:8000`.
 - The `--reload` flag enables auto-reload for development.
 
-### 6. Run the Frontend
+### 7. Run the Frontend
 The frontend is built with HTML, CSS, and JavaScript and can be served using a simple HTTP server. You can use `live-server` .
+
 
 #### Serve the Frontend
 open the frontend folder in vscode and click the index.html inside the frontend folder then click on Go Live (if you donot install Live server Extension on your vscode please install first then only you can see the Go Live bottom of the vscode )
